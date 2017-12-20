@@ -2,6 +2,7 @@ pipeline-test
 peptide.ratios.rds
 protein.ratios.rds
 t.corr.csv
+*.swp
 
 Test/*.canno
 Test/*.cnlcp
