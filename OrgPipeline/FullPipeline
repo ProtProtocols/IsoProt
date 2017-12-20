@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# remove quotation marks from mgf-files (not sure whether still necessary)
+for file in ../*.mgf
+do
+    sed 's/"//g' "$file" > "${file##*/}"
+done
+
+
+# Generate decoy
+java -cp /home/biodocker/bin/SearchGUI-*/SearchGUI-*.jar  eu.isas.searchgui.cmd.FastaCLI -in  ../swissprotHuman.fasta -decoy
+
+# Create parameter file for SearchGUI
+java -cp /home/biodocker/bin/SearchGUI-*/SearchGUI-*.jar  eu.isas.searchgui.cmd.IdentificationParametersCLI -prec_tol 10 -frag_tol 0.05 -fixed_mods "Carbamidomethylation of C,iTRAQ 8-plex of K, iTRAQ 8-plex of peptide N-term"  -variable_mods "Oxidation of M, iTRAQ 8-plex of Y" -db ../swissprotHuman_concatenated_target_decoy.fasta  -out iTRAQ.par -mc 1
+
+# SearchGUI
+java -cp /home/biodocker/bin/SearchGUI-*/SearchGUI-*.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files ./  -output_folder ./  -id_params iTRAQ.par -xtandem 0 -msgf 1 -comet 0 -ms_amanda 0 -myrimatch 0
+
+# PeptideShaker
+java -Xmx4G  -cp /home/biodocker/bin/PeptideShaker-*/PeptideShaker-*.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -experiment iTRAQ -sample test -replicate 1 -identification_files "./"  -out ./iTRAQ.cpsx -id_params iTRAQ.par -spectrum_files './'
+
+# Output results
+java -cp /home/biodocker/bin/PeptideShaker-*/PeptideShaker-*.jar eu.isas.peptideshaker.cmd.ReportCLI -in "iTRAQ.cpsx" -out_reports "./" -reports "0, 3, 5, 7, 8"
+
+# Quantification (isobar)
+# -> see R script
