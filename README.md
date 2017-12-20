@@ -26,7 +26,7 @@ biodocker@JG-T460s:/data$ Scripts/pipeline.sh -d Test/sp_human.fasta -p 20 -f 0.
 biodocker@JG-T460s:/data$ Rscript Scripts/isobar_analysis.R pipeline-test/experiment1_test_1_Extended_PSM_Report.txt pipeline-test/test.mgf
 ```
 
-This will only execute the search and the result generation. The resulting `
+Sensible quantitation results can be generated using the `test_big.mgf` file.
 
 ## Structure
 
