@@ -6,7 +6,7 @@ This project is still in a development stage. All resources are only intended to
 
 To build the Docker image on a linux (tested on Ubuntu) system you can use the `DockerSetup/rebuild_docker.sh` script.
 
-This script is expected to be executed from the root directory:
+This script is expected to be executed from the root directory and you might have to make it executable (or just write _bash_ before the following command):
 
 ```bash
 test@mashine:/tmp/IsoLabeledProtocol$ DockerSetup/rebuild_docker.sh
@@ -14,7 +14,7 @@ test@mashine:/tmp/IsoLabeledProtocol$ DockerSetup/rebuild_docker.sh
 
 ## Testing
 
-To launch the docker image you can use `Test/run_docker.sh` script. Again, this was only tested on Ubuntu.
+To launch the docker image you can use `Test/run_docker.sh` script (remember to make it executable). Again, this was only tested on Ubuntu.
 
 To then launch the pipeline use:
 
