@@ -40,6 +40,7 @@ The repository is structured in the following way:
 
   - [ ] Change statically typed variables to command line parameters
   - [ ] Replace isobar version with one of our's
+  - [ ] Output files, which folder structure?
 
 Planned features:
 
