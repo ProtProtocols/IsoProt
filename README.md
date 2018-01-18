@@ -1,50 +1,37 @@
 # IsoLabeledProtocol
 
-This project is still in a development stage. All resources are only intended to be used for testing.
+This project is still in a development stage. All resources are only intended to be used for testing. The protocol is based on the following template implementing an environment based on jupyter notebooks: https://github.com/ProtProtocols/protprotocols_template
 
-## Installation
+## Usage
+- You need to have docker installed. For more details, see https://docs.docker.com/engine/installation/
 
-To build the Docker image on a linux (tested on Ubuntu) system you can use the `DockerSetup/rebuild_docker.sh` script.
-
-This script is expected to be executed from the root directory and you might have to make it executable (or just write _bash_ before the following command):
-
+- Get the docker image (you might need to be administrator): 
 ```bash
-test@mashine:/tmp/IsoLabeledProtocol$ DockerSetup/rebuild_docker.sh
+docker pull veitveit/isolabeledprotocol:latest
 ```
 
-## Testing
-
-To launch the docker image you can use `Test/run_docker.sh` script (remember to make it executable). Again, this was only tested on Ubuntu.
-
-To then launch the pipeline use:
-
+- Run the image
 ```bash
-# Run the search
-biodocker@JG-T460s:/data$ Scripts/pipeline.sh -d Test/sp_human.fasta -p 20 -f 0.05 -c 1 Test/test.mgf
-
-# Analyse the result
-biodocker@JG-T460s:/data$ Rscript Scripts/isobar_analysis.R pipeline-test/experiment1_test_1_Extended_PSM_Report.txt pipeline-test/test.mgf
+docker run -it -p 8888:8888 isolabeledprotocol:latest
 ```
 
-Sensible quantitation results can be generated using the `test_big.mgf` file.
+- Open your favorite web browser and access the image via 0.0.0.0:8888
 
-## Structure
+- You can start with the example use case by clicking on the file Example.ipynb
 
-The repository is structured in the following way:
 
-  * **DockerSetup:** Files / Scripts required to build the docker image
-  * **Test**: Files and Scripts used for testing the pipeline
-  * **Scripts**: The analysis pipeline related scripts. These scripts are currently not added to the docker image to simplify the development. At a later stage, these should be included in the image.
+## Development
+
+Change Dockerfile and file structure to add further software tools or jupyter features. 
+
 
 ## ToDo
 
-  - [ ] Change statically typed variables to command line parameters
+  - [ ] More detailed description for development
   - [ ] Replace isobar version with one of our's
-  - [ ] Output files, which folder structure?
+  - [ ] Output files, which folder structure? General cleanup of files
 
 Planned features:
 
   - [ ] Add support for more complex experimental setups (ie. grouping of channels)
-    - This probably requires a web-based interface to take the different numbers of channels per quant strategy into consideration
-  - [ ] Replace `pipeline.sh` script by web-based Python application
-  - [ ] Add RShiny based result viewer application
+  - [ ] Add interactive result viewer
