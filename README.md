@@ -12,7 +12,7 @@ docker pull veitveit/isolabeledprotocol:latest
 
 - Run the image
 ```bash
-docker run -it -p 8888:8888 isolabeledprotocol:latest
+docker run -it -p 8888:8888 veitveit/isolabeledprotocol:latest
 ```
 
 - Open your favorite web browser and access the image via 0.0.0.0:8888
