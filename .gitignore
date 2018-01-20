@@ -3,6 +3,7 @@ peptide.ratios.rds
 protein.ratios.rds
 t.corr.csv
 *.swp
+.ipynb_checkpoints
 
 Test/*.canno
 Test/*.cnlcp
