@@ -30,6 +30,8 @@ Change Dockerfile and file structure to add further software tools or jupyter fe
   - [ ] More detailed description for development
   - [ ] Replace isobar version with one of our's
   - [ ] Output files, which folder structure? General cleanup of files
+  - [ ] Assure that people use a local working directory. Otherwise, many will be
+        surprised that their work is lost once they shutdown the docker container.
 
 Planned features:
 
