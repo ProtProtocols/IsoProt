@@ -11,3 +11,4 @@ Test/*.csarr
 Test/*.cseq
 Test/*.cui
 Test/sp_human_concatenated_target_decoy.fasta
+LocalTest

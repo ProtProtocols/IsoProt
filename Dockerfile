@@ -35,6 +35,7 @@ ENV PATH /home/biodocker/bin/SearchGUI:/home/biodocker/bin/PeptideShaker:$PATH
 WORKDIR /home/biodocker/
 
 COPY Example.ipynb .
+COPY Python_example.ipynb .
 COPY Test/test.mgf IN
 COPY Test/sp_human.fasta IN
 
