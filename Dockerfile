@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y mono-complete
 USER biodocker
 
 RUN mkdir /home/biodocker/bin
-RUN PVersion=1.16.16 && ZIP=PeptideShaker-${PVersion}.zip && \
+RUN PVersion=1.16.17 && ZIP=PeptideShaker-${PVersion}.zip && \
     wget -q http://genesis.ugent.be/maven2/eu/isas/peptideshaker/PeptideShaker/${PVersion}/$ZIP -O /tmp/$ZIP && \
     unzip /tmp/$ZIP -d /home/biodocker/bin/ && rm /tmp/$ZIP && \
     bash -c 'echo -e "#!/bin/bash\njava -jar /home/biodocker/bin/PeptideShaker-${PVersion}/PeptideShaker-${PVersion}.jar $@"' > /home/biodocker/bin/PeptideShaker && \
