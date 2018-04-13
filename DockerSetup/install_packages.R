@@ -3,4 +3,4 @@ update.packages(ask=F)
 source("https://bioconductor.org/biocLite.R")
 biocLite(ask=F)
 
-biocLite(c("isobar", "limma", "grimbough/Rhdf5lib", "sneumann/mzR","lgatto/MSnbase"))
+biocLite(c("isobar", "limma", "grimbough/Rhdf5lib", "sneumann/mzR","lgatto/MSnbase","Bioconductor/S4Vectors","Bioconductor/IRanges","Bioconductor/BiocGenerics"))
