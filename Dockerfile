@@ -8,7 +8,7 @@ RUN apt-get update &&   apt-get install -y apt-transport-https libxml2-dev r-cra
 
 # Setup R
 ADD DockerSetup/install_packages.R /tmp/
-RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
+RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R && ls()
 
 # Install Mono
 RUN apt-get update && apt-get install -y mono-complete
