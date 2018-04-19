@@ -14,4 +14,4 @@ fi
 CONTAINER_ID=`sudo docker container ls | grep "${CONTAINER_NAME}" | sed 's|\([0-9a-z]*\).*|\1|'`
 
 # Launch bash
-sudo docker exec -t -i $CONTAINER_ID bash
+sudo docker exec -t -i --user root $CONTAINER_ID bash
