@@ -8,7 +8,6 @@ RUN apt-get update &&   apt-get install -y apt-transport-https libxml2-dev r-cra
 
 # Setup R
 ADD DockerSetup/install_packages.R /tmp/
-
 RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 
 # Install Mono
@@ -53,4 +52,4 @@ USER biodocker
 
 
 # Run example notebook to have the results ready
-RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb && jupyter trust Example.ipynb
+#RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb && jupyter trust Example.ipynb
