@@ -8,8 +8,10 @@ RUN apt-get update &&   apt-get install -y apt-transport-https libxml2-dev r-cra
 
 # Setup R
 ADD DockerSetup/install_packages.R /tmp/
-
 RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
+
+# Install python packages
+RUN pip3 install psutil
 
 # Install Mono
 RUN apt-get update && apt-get install -y mono-complete
@@ -37,6 +39,7 @@ WORKDIR /home/biodocker/
 
 COPY Example.ipynb .
 COPY Example_isobar.ipynb .
+COPY Scripts .
 COPY Test/test.mgf IN
 COPY Test/sp_human.fasta IN
 
