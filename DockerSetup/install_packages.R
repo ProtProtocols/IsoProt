@@ -2,5 +2,10 @@ options(repos = c(CRAN = "https://cran.rstudio.com"))
 update.packages(ask=F)
 source("https://bioconductor.org/biocLite.R")
 biocLite(ask=F)
-biocLite(c("isobar", "limma", "grimbough/Rhdf5lib", "sneumann/mzR","Bioconductor/S4Vectors","Bioconductor/IRanges","Bioconductor/BiocGenerics", "lgatto/MSnbase"))
+
+packages.to.install <- c("Bioconductor/BiocGenerics","Bioconductor/S4Vectors","Bioconductor/IRanges","grimbough/Rhdf5lib","sneumann/mzR","limma","isobar", "lgatto/MSnbase")
+
+for (package in packages.to.install) {
+    biocLite(package)
+}
 
