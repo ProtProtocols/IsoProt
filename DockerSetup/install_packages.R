@@ -3,7 +3,8 @@ update.packages(ask=F)
 source("https://bioconductor.org/biocLite.R")
 biocLite(ask=F)
 
-packages.to.install <- c("Bioconductor/BiocGenerics","Bioconductor/S4Vectors","Bioconductor/IRanges","grimbough/Rhdf5lib","sneumann/mzR","limma","isobar", "lgatto/MSnbase")
+packages.to.install <- 
+c("Bioconductor/BiocGenerics","Bioconductor/S4Vectors","Bioconductor/IRanges","grimbough/Rhdf5lib","sneumann/mzR","limma","isobar", "lgatto/MSnbase","shiny")
 
 for (package in packages.to.install) {
     biocLite(package)
