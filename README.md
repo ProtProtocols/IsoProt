@@ -1,9 +1,17 @@
 # IsoLabeledProtocol
 
-This project is still in a development stage. All resources are only intended to be used for testing. The protocol is based on the following template implementing an environment based on jupyter notebooks: https://github.com/ProtProtocols/protprotocols_template
+This project provides a reproducible pipeline to analyse isobarically labelled mass spectrometry based quantitative proteomics data.
+
+The different workflows are created using the [jupyter notebook](http://jupyter.org) environment. They look like normal documents with interactive elements (like buttons, etc.) in them and are based on our [standrad workflow template](https://github.com/ProtProtocols/protprotocols_template). Thereby, they also provide completely reproducible records of the bioinformatic pipeline used to analyse the data.
+
+The pipelines are made available as [Docker](https://www.docker.com) containers. These are light-weight virtual machines that contain the complete software necessary to run the pipeline. Thereby, you do not have to worry about installing any additional required software.
+
+This project is **still under development**. All resources are only intended to be used for testing. We are simply not done yet.
 
 ## Usage
 - You need to have docker installed. For more details, see https://docs.docker.com/engine/installation/
+
+The following commands have to be execute in your operating systems command prompt.
 
 - Get the docker image (you might need to be administrator): 
 ```bash
@@ -19,21 +27,6 @@ docker run -it -p 8888:8888 veitveit/isolabeledprotocol:latest
 
 - You can start with the example use case by clicking on the file Example.ipynb
 
+## Feedback
 
-## Development
-
-Change Dockerfile and file structure to add further software tools or jupyter features. 
-
-
-## ToDo
-
-  - [ ] More detailed description for development
-  - [ ] Replace isobar version with one of our's
-  - [ ] Output files, which folder structure? General cleanup of files
-  - [ ] Assure that people use a local working directory. Otherwise, many will be
-        surprised that their work is lost once they shutdown the docker container.
-
-Planned features:
-
-  - [ ] Add support for more complex experimental setups (ie. grouping of channels)
-  - [ ] Add interactive result viewer
+In case you have any questions about using the pipeline or find an issue, please simply [submit an issue](https://github.com/ProtProtocols/IsoLabeledProtocol/issues) through this GitHub page.
