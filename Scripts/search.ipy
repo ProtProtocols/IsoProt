@@ -1,9 +1,23 @@
 """
-This file contains the complete python code to display a user interface in a
-Jupyter cell and allows user to perform an MS/MS database search.
+This module displays a user interface to define all settings
+required to run a MS/MS search and the subsequent label-free
+analysis.
 
-All searchGUI and PeptideShaker functions used in this workflow are called and
-managed through this file.
+Input (search_in):
+  :key workdir: Absolute path to the working directory to use
+  :key fasta_db_path: Absolute path to the FASTA file to use
+  :key generate_decoy: Boolean to indicate whether reversed decoy sequences should be generated.
+  :key input_directory: Absolute path to the directory containing the MS/MS spectra files (in MGF format)
+  :key precursor_tolerance: The precursor tolerance in ppm
+  :key fragment_tolerance: The fragment tolerance in Da
+  :key labelling: The labelling PTM definition
+  :key labelling_method: The labelling method's name
+  :key missed_cleavages: Number of missed cleavages allowed (int)
+  :key var_ptms: A list/duple of variable PTMs to include in the search
+  :key fixed_ptms: A complete string definition of the fixed PTMs to use (not
+                     including the labelling method).
+Output (search_out):
+  :key result_file: Path to the (TSV) result file.
 """
 
 import os
@@ -11,6 +25,33 @@ import time
 import typing
 import psutil
 import subprocess
+
+global search_in, search_out
+
+
+def main():
+    # make sure the input object exists
+    if "search_in" not in globals():
+        raise Exception("Missing required settings object 'search_in'")
+
+    global search_in
+
+    # automatically launch the search
+    result_file = run(work_dir=search_in["workdir"],
+                      fasta_db_path=search_in["fasta_db"],
+                      generate_decoy=search_in["generate_decoy"],
+                      spectra_dir=search_in["input_directory"],
+                      precursor_tolerance=search_in["precursor_tolerance"],
+                      fragment_tolerance=search_in["fragment_tolerance"],
+                      labelling=search_in["labelling"],
+                      labelling_method=search_in["labelling_method"],
+                      missed_cleavages=search_in["missed_cleavages"],
+                      var_ptms=search_in["var_ptms"],
+                      fixed_ptms=search_in["fixed_ptms"])
+
+    # create the result object
+    global search_out
+    search_out["result_file"] = result_file
 
 
 def adapt_mgf_titles(filenames):
@@ -90,7 +131,7 @@ class TaskRunner:
                 raise Exception("Error: Result fle '%s' not found." % check_for_file)
 
         run_time = time.time() - start_time
-        # TODO explore better formating
+        # TODO explore better formatting
         run_time_str = "%d sec" % run_time if run_time < 60 else "%d:%d min" % (run_time // 60, run_time % 60)
         print("    Completed in %s" % run_time_str)
 
@@ -105,31 +146,13 @@ def run(work_dir: str,
         labelling_method: str,
         missed_cleavages: int,
         var_ptms: typing.Tuple[str, ...],
-        fixed_ptms: str,
-        exp_design_file_path: str #TODO
+        fixed_ptms: str
         ):
     """
     Generate the decoy database, run the search, and convert the search engine results to TSV files.
 
     :return: tsv_result_file_path
     """
-
-    # for k, v in (
-    #         ("work_dir           ,", work_dir),
-    #         ("fasta_db           ,", fasta_db),
-    #         ("generate_decoy     ,", generate_decoy),
-    #         ("spectra_dir        ,", spectra_dir),
-    #         ("precursor_tolerance,", precursor_tolerance),
-    #         ("fragment_tolerance ,", fragment_tolerance),
-    #         ("labelling          ,", labelling),
-    #         ("labelling_method   ,", labelling_method),
-    #         ("missed_cleavages   ,", missed_cleavages),
-    #         ("var_ptms           ,", var_ptms),
-    #         ("fixed_ptms         ,", fixed_ptms),
-    # ):
-    #     print(k, v)
-    #
-    # print("=======================")
 
     # function to callculate paths local to work_dir
     def get_path(*args):
@@ -181,7 +204,7 @@ def run(work_dir: str,
         print("Creating decoy database...")
 
         # create the decoy database
-        subprocess.run(["java", "-Xmx%sM" % free_mem,
+        subprocess.run(["java", "-Xmx" + str(free_mem) + "M",
                         "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.FastaCLI",
                         "-in", fasta_db_path,
                         "-decoy"],
@@ -207,17 +230,18 @@ def run(work_dir: str,
         os.remove(param_file)
 
     search_args = [
-        "java", "-Xmx%sM" % free_mem,
+        "java", "-Xmx" + str(free_mem) + "M",
         "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.IdentificationParametersCLI",
         "-out", param_file,
         "-prec_tol", str(precursor_tolerance),
         "-frag_tol", str(fragment_tolerance),
         "-db", database_file,
-        "-fixed_mods", "%s,%s" % (labelling, fixed_ptms),  # TODO: labelling cannot always be set as fixed mod???
+        # TODO: labelling cannot always be set as fixed mod???
+        "-fixed_mods", str(labelling) + "," + str(fixed_ptms),
         "-mc", str(missed_cleavages),
     ]
 
-    # add variable modofications to search_args
+    # add variable modifications to search_args
     if len(var_ptms) > 0 or ("Y variable" in labelling_method):
         var_mod_list = []
 
@@ -235,7 +259,7 @@ def run(work_dir: str,
         search_args.append("-variable_mods")
         search_args.append(",".join(var_mod_list))
 
-    task_run("Creating serach parameter file",
+    task_run("Creating search parameter file",
              search_args,
              check_for_file=param_file,
              check=True
@@ -247,7 +271,7 @@ def run(work_dir: str,
     # TODO: create list of spectrum files - or the folder
     spectrum_files = peaklist_abspath
     task_run("SearchCLI",
-             ["java", "-Xmx%sM" % free_mem,
+             ["java", "-Xmx" + str(free_mem) + "M",
               "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.SearchCLI",
               "-spectrum_files", spectrum_files,
               "-output_folder", work_dir,
@@ -268,7 +292,7 @@ def run(work_dir: str,
 
     peptide_shaker_result_file_path = get_path("experiment.cpsx")
     task_run("PeptideShakerCLI processing",
-             ["java", "-Xmx%sM" % free_mem,
+             ["java", "-Xmx" + str(free_mem) + "M",
               "-cp", peptide_shaker_jar_path, "eu.isas.peptideshaker.cmd.PeptideShakerCLI",
               "-useGeneMapping", "0",
               "-experiment", "experiment1",
@@ -287,7 +311,7 @@ def run(work_dir: str,
 
     tsv_result_file_path = get_path("experiment1_test_1_Extended_PSM_Report.txt")
     task_run("ReportCLI (conversion to .tsv)",
-             ["java", "-Xmx%sM" % free_mem,
+             ["java", "-Xmx" + str(free_mem) + "M",
               "-cp", peptide_shaker_jar_path, "eu.isas.peptideshaker.cmd.ReportCLI",
               "-in", peptide_shaker_result_file_path,
               "-out_reports", work_dir,
@@ -298,3 +322,8 @@ def run(work_dir: str,
 
     print("Search Done.")
 
+    return tsv_result_file_path
+
+
+if __name__ == "__main__":
+    main()
