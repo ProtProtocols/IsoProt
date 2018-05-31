@@ -115,17 +115,19 @@ class SearchUI:
     def updateFastaFiles(self, workdir):
         """
         Update the drop-down list that lists all available FASTA files found in the
-        current input directory.
+        current input directory.]
         :param workdir: The current working directory used to search for FASTA files.
         """
         # get all FASTA files
-        fasta_files = [file for file in os.listdir(workdir) if file[-6:] == ".fasta"]
+        fasta_files = [file for file in os.listdir(workdir)
+                               if file.endswith(".fasta") and ('decoy' not in file)]
 
         # also search all subdirectories for FASTA files
         for d in os.listdir(workdir):
             d_path = os.path.join(workdir, d)
             if os.path.isdir(d_path) and d[0] != ".":
-                fasta_files += [os.path.join(d, file) for file in os.listdir(d_path) if file[-6:] == ".fasta"]
+                fasta_files += [os.path.join(d, file) for file in os.listdir(d_path)
+                                                        if file.endswith(".fasta") and ('decoy' not in file)]
 
         # create the dict to add as values to the control
         file_list = dict()
@@ -225,7 +227,7 @@ class ExpDesignUI:
 
         self.searchUI = searchUI
 
-        self.result_file = os.path.join(searchUI.get_work_dir(), "exp_design.tsv")
+        self.result_file_path = os.path.join(searchUI.get_work_dir(), "exp_design.tsv")
 
         # always expect two groups
         self.group1_name = widgets.Text(placeholder="Treatment", description="Group 1:")
@@ -310,7 +312,7 @@ class ExpDesignUI:
             data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group},
         )
 
-        design_data.to_csv(path_or_buf=self.result_file, sep="\t", index=False)
+        design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)
 
         # add the run search button
         if not self.search_button_visible:
@@ -323,7 +325,7 @@ class ExpDesignUI:
             )
 
             self.search_button.on_click(
-                lambda _: self.run_search(self.searchUI, self.result_file)
+                lambda _: self.run_search(self.searchUI, self.result_file_path)
             )
 
             search_box = VBox([self.search_button])
@@ -331,7 +333,7 @@ class ExpDesignUI:
 
             self.search_button_visible = True
 
-    def run_search(self, searchUI, result_file):
+    def run_search(self, searchUI, exp_design_file_path):
 
 
         # make sure all required fields were selected
@@ -352,29 +354,28 @@ class ExpDesignUI:
         searchUI.save_config(os.path.join(work_dir, "search_settings.json"))
 
 
-        search.run(  work_dir
-                    , searchUI.fasta_db.value
-                    , searchUI.generate_decoy.value
-                    , searchUI.spectra_dir.value
-                    , searchUI.precursor_tolerance.value
-                    , searchUI.fragment_tolerance.value
-                    , searchUI.labelling.value
-                    , searchUI.get_labelling_method()
-                    , searchUI.missed_cleavages.value
-                    , searchUI.var_ptms.value
-                    , searchUI.fixed_ptms.value
-                    , result_file=result_file
-                    )
+        search.run(work_dir
+                   , searchUI.fasta_db.value
+                   , searchUI.generate_decoy.value
+                   , searchUI.spectra_dir.value
+                   , searchUI.precursor_tolerance.value
+                   , searchUI.fragment_tolerance.value
+                   , searchUI.labelling.value
+                   , searchUI.get_labelling_method()
+                   , searchUI.missed_cleavages.value
+                   , searchUI.var_ptms.value
+                   , searchUI.fixed_ptms.value
+                   , exp_design_file_path
+                   )
 
         # create parameter list as input for R script
         global Rinput
         Rinput.clear()
-        Rinput.extend(
-            [searchUI.labelling.value, searchUI.spectra_dir.value, work_dir,
-             searchUI.summarization_method.value, searchUI.min_protein_psms.value,
-             searchUI.use_ptms_for_quant.value, searchUI.target_fdr.value]
-
-        )
+        Rinput.extend( [
+            searchUI.labelling.value, searchUI.spectra_dir.value, work_dir,
+            searchUI.summarization_method.value, searchUI.min_protein_psms.value,
+            searchUI.use_ptms_for_quant.value, searchUI.target_fdr.value
+        ] )
 
 
         # add the new button to run the R scripts

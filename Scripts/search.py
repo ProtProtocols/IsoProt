@@ -7,8 +7,11 @@ managed through this file.
 """
 
 import os
-import subprocess
+import time
+import typing
 import psutil
+import subprocess
+
 
 def adapt_mgf_titles(filenames):
     """
@@ -68,26 +71,72 @@ def filter_mgf_peaks(filenames, min_mz=100, max_mz=150):
                     writer.write(line)
 
 
-def run( work_dir: str
-        , fasta_db
-        , generate_decoy
-        , spectra_dir
-        , precursor_tolerance
-        , fragment_tolerance
-        , labelling
-        , labelling_method
-        , missed_cleavages
-        , var_ptms
-        , fixed_ptms
-        , result_file=None
-):
+class TaskRunner:
+    def __init__(self, cwd):
+        self.cwd = cwd
+
+    def __call__(self, name, param_list, check_for_file=None, **kwargv):
+        print("Start:", name)
+
+        start_time = time.time()
+        task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
+
+        if task.returncode != 0:
+            print(task.stdout)
+            raise Exception("Error: %s failed" % name)
+
+        if check_for_file:
+            if not os.path.isfile(check_for_file):
+                raise Exception("Error: Result fle '%s' not found." % check_for_file)
+
+        run_time = time.time() - start_time
+        # TODO explore better formating
+        run_time_str = "%d sec" % run_time if run_time < 60 else "%d:%d min" % (run_time // 60, run_time % 60)
+        print("    Completed in %s" % run_time_str)
+
+
+def run(work_dir: str,
+        fasta_db_path: str,
+        generate_decoy: bool,
+        spectra_dir: str,
+        precursor_tolerance: float,
+        fragment_tolerance: float,
+        labelling: str,
+        labelling_method: str,
+        missed_cleavages: int,
+        var_ptms: typing.Tuple[str, ...],
+        fixed_ptms: str,
+        exp_design_file_path: str #TODO
+        ):
     """
     Generate the decoy database, run the search, and convert the search engine results to TSV files.
 
-    :return: None
+    :return: tsv_result_file_path
     """
 
+    # for k, v in (
+    #         ("work_dir           ,", work_dir),
+    #         ("fasta_db           ,", fasta_db),
+    #         ("generate_decoy     ,", generate_decoy),
+    #         ("spectra_dir        ,", spectra_dir),
+    #         ("precursor_tolerance,", precursor_tolerance),
+    #         ("fragment_tolerance ,", fragment_tolerance),
+    #         ("labelling          ,", labelling),
+    #         ("labelling_method   ,", labelling_method),
+    #         ("missed_cleavages   ,", missed_cleavages),
+    #         ("var_ptms           ,", var_ptms),
+    #         ("fixed_ptms         ,", fixed_ptms),
+    # ):
+    #     print(k, v)
+    #
+    # print("=======================")
 
+    # function to callculate paths local to work_dir
+    def get_path(*args):
+        return os.path.join(work_dir, *args)
+
+    # initialise work_dir for subprocess.run
+    task_run = TaskRunner(work_dir)
 
     # get the free memory in MB
     free_mem = round(psutil.virtual_memory().available / 1024 / 1024)
@@ -95,16 +144,13 @@ def run( work_dir: str
     if free_mem > 1000:
         free_mem -= 1000
 
-
     # create the directory paths to work in
-    peaklist_dir = os.path.abspath(spectra_dir)
+    peaklist_abspath = os.path.abspath(spectra_dir)
+    if not os.path.isdir(peaklist_abspath):
+        raise Exception("Invalid peak list directory selected: " + peaklist_abspath + " does not exist.")
 
-    if not os.path.isdir(peaklist_dir):
-        raise Exception("Invalid peak list directory selected: " + peaklist_dir + " does not exist.")
-
-    peptide_shaker_jar = "/home/biodocker/bin/PeptideShaker-1.16.17/PeptideShaker-1.16.17.jar"
-    searchgui_jar = "/home/biodocker/bin/SearchGUI-3.2.20/SearchGUI-3.2.20.jar"
-    exp_design_file = os.path.join(work_dir, "exp_design.tsv")
+    peptide_shaker_jar_path = "/home/biodocker/bin/PeptideShaker-1.16.17/PeptideShaker-1.16.17.jar"
+    searchgui_jar_path = "/home/biodocker/bin/SearchGUI-3.2.20/SearchGUI-3.2.20.jar"
 
     # the searches should be performed in the "OUT" directory
     if not os.path.isdir(work_dir):
@@ -117,11 +163,11 @@ def run( work_dir: str
             if os.path.isfile(complete_name):
                 os.remove(complete_name)
 
-
     # -------------------------------------
     # Fix all MGF titles
     print("Adapting MGF titles...")
-    mgf_filenames = [os.path.join(peaklist_dir, f) for f in os.listdir(peaklist_dir) if f[-4:].lower() == ".mgf"]
+    mgf_filenames = [os.path.join(peaklist_abspath, f) for f in os.listdir(peaklist_abspath) if
+                     f[-4:].lower() == ".mgf"]
     adapt_mgf_titles(mgf_filenames)
     print(mgf_filenames)
 
@@ -135,16 +181,17 @@ def run( work_dir: str
         print("Creating decoy database...")
 
         # create the decoy database
-        subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
-                        "eu.isas.searchgui.cmd.FastaCLI", "-in", fasta_db, "-decoy"], check=True,
-                       cwd=work_dir,
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(["java", "-Xmx%sM" % free_mem,
+                        "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.FastaCLI",
+                        "-in", fasta_db_path,
+                        "-decoy"],
+                       check=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # get the filename of the decoy database
-        database_file = os.path.abspath(fasta_db)[:-6] + "_concatenated_target_decoy.fasta"
+        database_file = os.path.abspath(fasta_db_path)[:-6] + "_concatenated_target_decoy.fasta"
     else:
         # simply use the selected database file
-        database_file = os.path.abspath(fasta_db)
+        database_file = os.path.abspath(fasta_db_path)
 
     if not os.path.isfile(database_file):
         raise Exception("Failed to find generated decoy database")
@@ -152,129 +199,102 @@ def run( work_dir: str
     # ---------------------------------------------
     # Create the search parameter file
 
-    # build the arguments to create the parameter file
-    param_file = os.path.join(work_dir, "search.par")
+    # path to resulting parameter file
+    param_file = get_path("search.par")
 
     # remove any old parameters
     if os.path.isfile(param_file):
         os.remove(param_file)
 
-    search_args = list(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
-                        "eu.isas.searchgui.cmd.IdentificationParametersCLI",
-                        "-out", param_file])
+    search_args = [
+        "java", "-Xmx%sM" % free_mem,
+        "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.IdentificationParametersCLI",
+        "-out", param_file,
+        "-prec_tol", str(precursor_tolerance),
+        "-frag_tol", str(fragment_tolerance),
+        "-db", database_file,
+        "-fixed_mods", "%s,%s" % (labelling, fixed_ptms),  # TODO: labelling cannot always be set as fixed mod???
+        "-mc", str(missed_cleavages),
+    ]
 
-    # precursor tolerance
-    search_args.append("-prec_tol")
-    search_args.append(str(precursor_tolerance))
-    # fragment tolerance
-    search_args.append("-frag_tol")
-    search_args.append(str(fragment_tolerance))
-    # fixed mods
-    # TODO: labelling cannot always be set as fixed mod???
-    fixed_mod_string = str(labelling) + "," + str(fixed_ptms)
-    search_args.append("-fixed_mods")
-    search_args.append(fixed_mod_string)
-    # database
-    search_args.append("-db")
-    search_args.append(database_file)
-    # missed cleavages
-    search_args.append("-mc")
-    search_args.append(str(missed_cleavages))
-
+    # add variable modofications to search_args
     if len(var_ptms) > 0 or ("Y variable" in labelling_method):
-        search_args.append("-variable_mods")
-        var_mod_list = list()
+        var_mod_list = []
 
         for var_mod in var_ptms:
             if var_mod == "Phosphorylation of STY":
                 var_mod_list += ["Phosphorylation of S", "Phosphorylation of T", "Phosphorylation of Y"]
             else:
                 var_mod_list.append(var_mod)
+
         if labelling_method == "iTRAQ4 (Y variable)":
             var_mod_list.append("iTRAQ 4-plex of Y")
         if labelling_method == "iTRAQ8 (Y variable)":
             var_mod_list.append("iTRAQ 8-plex of Y")
 
+        search_args.append("-variable_mods")
         search_args.append(",".join(var_mod_list))
 
-    # create the search parameter file
-    print("Creating search parameter file...")
-    # print(" ".join(search_args))
-    subprocess.run(search_args, check=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    if not os.path.isfile(param_file):
-        raise Exception("Failed to create search parameters")
+    task_run("Creating serach parameter file",
+             search_args,
+             check_for_file=param_file,
+             check=True
+             )
 
     # ------------------------------------------------
     # Run the search
-    print("Running search...")
+
     # TODO: create list of spectrum files - or the folder
-    spectrum_files = peaklist_dir
-    print("  Searching files in " + spectrum_files)
-    search_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
-                                     "eu.isas.searchgui.cmd.SearchCLI", "-spectrum_files", spectrum_files,
-                                     "-output_folder", work_dir, "-id_params", param_file,
-                                     "-xtandem", "0", "-msgf", "1", "-comet", "0", "-ms_amanda", "0",
-                                     "-myrimatch", "0", "-andromeda", "0", "-omssa", "0", "-tide", "0"],
-                                    check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                    universal_newlines=True)
-
-    if search_process.returncode != 0:
-        print(search_process.stdout)
-        raise Exception("Search process failed.")
-
-    print("Search completed.")
+    spectrum_files = peaklist_abspath
+    task_run("SearchCLI",
+             ["java", "-Xmx%sM" % free_mem,
+              "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.SearchCLI",
+              "-spectrum_files", spectrum_files,
+              "-output_folder", work_dir,
+              "-id_params", param_file,
+              "-xtandem", "0",
+              "-msgf", "1",
+              "-comet", "0",
+              "-ms_amanda", "0",
+              "-myrimatch", "0",
+              "-andromeda", "0",
+              "-omssa", "0",
+              "-tide", "0"],
+             universal_newlines=True
+             )
 
     # -------------------------------------------------
     # Run PeptideShaker
-    print("Processing result using PeptideShaker...")
-    peptide_shaker_result_file = os.path.join(work_dir, "experiment.cpsx")
 
-    peptide_shaker_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", peptide_shaker_jar,
-                                             "eu.isas.peptideshaker.cmd.PeptideShakerCLI",
-                                             "-useGeneMapping", "0",
-                                             "-experiment", "experiment1",
-                                             "-sample", "test",
-                                             "-replicate", "1",
-                                             "-identification_files", work_dir,
-                                             "-out", peptide_shaker_result_file,
-                                             "-id_params", param_file,
-                                             "-spectrum_files", spectrum_files],
-                                            check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                            universal_newlines=True)
-
-    if peptide_shaker_process.returncode != 0:
-        print(peptide_shaker_process.stdout)
-        raise Exception("Failed to run PeptideShaker")
-
-    if not os.path.isfile(peptide_shaker_result_file):
-        raise Exception("Failed to process result file.")
+    peptide_shaker_result_file_path = get_path("experiment.cpsx")
+    task_run("PeptideShakerCLI processing",
+             ["java", "-Xmx%sM" % free_mem,
+              "-cp", peptide_shaker_jar_path, "eu.isas.peptideshaker.cmd.PeptideShakerCLI",
+              "-useGeneMapping", "0",
+              "-experiment", "experiment1",
+              "-sample", "test",
+              "-replicate", "1",
+              "-identification_files", work_dir,
+              "-out", peptide_shaker_result_file_path,
+              "-id_params", param_file,
+              "-spectrum_files", spectrum_files],
+             check_for_file=peptide_shaker_result_file_path,
+             universal_newlines=True
+             )
 
     # ---------------------------------------------------
     # create TSV output files
-    print("Converting result to TSV format...")
-    conversion_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", peptide_shaker_jar,
-                                         "eu.isas.peptideshaker.cmd.ReportCLI",
-                                         "-in", peptide_shaker_result_file,
-                                         "-out_reports", work_dir,
-                                         "-reports", "8"],
-                                        check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                        universal_newlines=True)
 
-    if conversion_process.returncode != 0:
-        print(conversion_process.stdout)
-        raise Exception("Conversion process failed")
-
-    result_file = os.path.join(work_dir, "experiment1_test_1_Extended_PSM_Report.txt")
-
-    if not os.path.isfile(result_file):
-        raise Exception("Error: Conversion failed")
-
+    tsv_result_file_path = get_path("experiment1_test_1_Extended_PSM_Report.txt")
+    task_run("ReportCLI (conversion to .tsv)",
+             ["java", "-Xmx%sM" % free_mem,
+              "-cp", peptide_shaker_jar_path, "eu.isas.peptideshaker.cmd.ReportCLI",
+              "-in", peptide_shaker_result_file_path,
+              "-out_reports", work_dir,
+              "-reports", "8"],
+             check_for_file=tsv_result_file_path,
+             universal_newlines=True
+             )
 
     print("Search Done.")
-
-
-
-
-
 
