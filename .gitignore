@@ -4,6 +4,7 @@ protein.ratios.rds
 t.corr.csv
 *.swp
 .ipynb_checkpoints
+.idea
 
 Test/*.canno
 Test/*.cnlcp
