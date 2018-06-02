@@ -1,9 +1,30 @@
 """
-This file contains the complete python code to display a user interface in a
-Jupyter cell and allows user to perform an MS/MS database search.
+This module displays a user interface to define all settings
+required to run a MS/MS search and the subsequent label-free
+analysis.
 
-All searchGUI and PeptideShaker functions used in this workflow are called and
-managed through this file.
+Input (search_ui_in):
+  :key on_complete_description: Text of the button displayed once the experimental
+                                design has been saved. If this is not set, nothing will
+                                be displayed once the user clicks "Save design"
+  :key on_complete_function: Function called once the user clicked the complete button.
+
+Output (search_ui_out):
+    :key work_dir: Path to the working directory.
+    :key precursor_tolerance: Precursor tolerance in ppm.
+    :key fragment_tolerance: Fragment tolerance in Da.
+    :key fasta_file: Path to the FASTA file.
+    :key generate_decoy: Boolean indicating whether to generate decoy sequences.
+    :key quantification_ptms: PTMs used by the quantification method (as string).
+    :key quantification_method: Name of the quantification method.
+    :key missed_cleavages: Number of missed cleavages allowed.
+    :key fixed_mods: PTM string showing the fixed modifications set.
+    :key var_mods: List of variable PTMs.
+    :key summarization_method: Summarization method to use to combined peptide quantification values to proteins.
+    :key min_protein_psms: Minimum PSMs per protein required.
+    :key use_ptms_for_quant: Indicates whether PTMs should be used for the quantification.
+    :key target_fdr: Target FDR to use (all levels).
+    :key spec_file_dir: Path to the spectrum directory.
 """
 
 import ipywidgets as widgets
@@ -13,18 +34,51 @@ import pandas as pd
 from IPython.display import Javascript, display
 import json
 
-# import search implementation every time as we develope
-import importlib
-import search
 
-importlib.reload(search)
+global search_ui_in, search_ui_out
+
+
+def main():
+    global search_ui_in, search_ui_out
+
+    # create the input object if it doesn't exist
+    if "search_ui_in" not in globals():
+        raise Exception("Missing required input parameter search_ui_in")
+    else:
+        if "on_complete_description" not in search_ui_in:
+            raise Exception("Missing required input key 'on_complete_description'")
+        if "on_complete_function" not in search_ui_in:
+            raise Exception("Missing required input key 'on_complete_function'")
+
+    # display the UI
+    searchUI = SearchUI()
+    searchUI.display()
+
+
+def final_button_clicked(searchUI, exp_design_file_path):
+    """
+    This function is executed once the user clicked the final
+    button to execute the next step.
+    :param searchUI:
+    :param exp_design_file_path:
+    """
+    global search_ui_in, search_ui_out
+
+    # create the output object
+    search_ui_out = searchUI.get_settings_as_dict()
+
+    # add the experimental design path
+    search_ui_out["exp_design_file"] = exp_design_file_path
+
+    # execute the user defined function
+    if search_ui_in["on_complete_function"]:
+        search_ui_in["on_complete_function"]()
 
 
 class SearchUI:
     """
     Class used to manage the search specific user interface.
     """
-
     def __init__(self):
         """
         Initializes the SearchUI object and creates all user interface
@@ -178,17 +232,35 @@ class SearchUI:
                                  'labelling method can no longer be changed.'),
                            self.exp_des_button])
 
-        # expDesign_box = self.expDesignUI.get_root_widget()
-        # self.tab = widgets.Tab([search_box, expDesign_box])
-        # self.tab.set_title(0, "Search Settigns")
-        # self.tab.set_title(1, "Experiment Design")
-        # ui = tab
-
         ui = search_box
         display(ui)
 
     def _ipython_display_(self):
         return self.display()
+
+    def get_settings_as_dict(self):
+        """
+        Transform all settings entered by the user into a dict.
+        :return:
+        """
+        search_config = dict()
+        search_config["workdir"] = self.work_dir_select.value
+        search_config["precursor_tolerance"] = self.precursor_tolerance.value
+        search_config["fragment_tolerance"] = self.fragment_tolerance.value
+        search_config["fasta_db"] = self.fasta_db.value
+        search_config["generate_decoy"] = self.generate_decoy.value
+        search_config["labelling"] = self.labelling.value
+        search_config["labelling_method"] = self.get_labelling_method()
+        search_config["missed_cleavages"] = self.missed_cleavages.value
+        search_config["fixed_ptms"] = self.fixed_ptms.value
+        search_config["var_ptms"] = self.var_ptms.value
+        search_config["summarization_method"] = self.summarization_method.value
+        search_config["min_protein_psms"] = self.min_protein_psms.value
+        search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
+        search_config["target_fdr"] = self.target_fdr.value
+        search_config["input_directory"] = self.spectra_dir.value
+
+        return search_config
 
     def save_config(self, file):
         """
@@ -196,20 +268,7 @@ class SearchUI:
         text file.
         :param: file: The name of the target file to use. Will be overwritten if it exists.
         """
-        search_config = dict()
-        search_config["work_dir"] = self.work_dir_select.value
-        search_config["precursor_tolerance"] = self.precursor_tolerance.value
-        search_config["fragment_tolerance"] = self.fragment_tolerance.value
-        search_config["fasta_file"] = self.fasta_db.value
-        search_config["generate_decoy"] = self.generate_decoy.value
-        search_config["quantification_method"] = self.labelling.value
-        search_config["missed_cleavages"] = self.missed_cleavages.value
-        search_config["fixed_mods"] = self.fixed_ptms.value
-        search_config["var_mods"] = self.var_ptms.value
-        search_config["summarization_method"] = self.summarization_method.value
-        search_config["min_protein_psms"] = self.min_protein_psms.value
-        search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
-        search_config["target_fdr"] = self.target_fdr.value
+        search_config = self.get_settings_as_dict()
 
         json_string = json.dumps(search_config)
 
@@ -292,6 +351,8 @@ class ExpDesignUI:
         Save the experimental design as a TSV file.
         :param button: The button that triggered the function.
         """
+        global search_ui_in
+
         # get all names
         sample_names = [s.value if s.value != "" else s.placeholder for s in self.channel_names]
         sample_group = [g.value for g in self.group_selects]
@@ -317,15 +378,14 @@ class ExpDesignUI:
         # add the run search button
         if not self.search_button_visible:
             self.search_button = widgets.Button(
-                description='Run search',
+                description=search_ui_in["on_complete_description"],
                 disabled=False,
                 button_style='',  # 'success', 'info', 'warning', 'danger' or ''
-                tooltip='Run the search',
                 icon='check'
             )
 
             self.search_button.on_click(
-                lambda _: self.run_search(self.searchUI, self.result_file_path)
+                lambda _: final_button_clicked(self.searchUI, self.result_file_path)
             )
 
             search_box = VBox([self.search_button])
@@ -333,90 +393,7 @@ class ExpDesignUI:
 
             self.search_button_visible = True
 
-    def run_search(self, searchUI, exp_design_file_path):
-
-
-        # make sure all required fields were selected
-        if searchUI.work_dir_select.value is None:
-            print("Error: No working directory selected")
-            return
-
-        if searchUI.fasta_db.value is None:
-            print("Error: No FASTA file selected")
-            return
-
-        # disable previous steps
-        self.search_button.disabled = True
-        self.save_button.disabled = True
-
-        # Save the settings
-        work_dir = os.path.abspath(os.path.join(searchUI.work_dir_select.value, "OUT"))
-        searchUI.save_config(os.path.join(work_dir, "search_settings.json"))
-
-
-        search.run(work_dir
-                   , searchUI.fasta_db.value
-                   , searchUI.generate_decoy.value
-                   , searchUI.spectra_dir.value
-                   , searchUI.precursor_tolerance.value
-                   , searchUI.fragment_tolerance.value
-                   , searchUI.labelling.value
-                   , searchUI.get_labelling_method()
-                   , searchUI.missed_cleavages.value
-                   , searchUI.var_ptms.value
-                   , searchUI.fixed_ptms.value
-                   , exp_design_file_path
-                   )
-
-        # create parameter list as input for R script
-        global Rinput
-        Rinput.clear()
-        Rinput.extend( [
-            searchUI.labelling.value, searchUI.spectra_dir.value, work_dir,
-            searchUI.summarization_method.value, searchUI.min_protein_psms.value,
-            searchUI.use_ptms_for_quant.value, searchUI.target_fdr.value
-        ] )
-
-
-        # add the new button to run the R scripts
-        run_quant_button = widgets.Button(
-            description="Run quantification and peptide inference",
-            layout=widgets.Layout(width='30%'))
-
-        run_quant_button.on_click(lambda _: display(
-            # Run the javascript code to launch the next cell
-            Javascript(
-                'IPython.notebook.execute_cell_range(IPython.notebook.get_selected_index()+1, IPython.notebook.get_selected_index()+6)')
-        ))
-
-        display(run_quant_button)
-
 
 # global stuff
 if __name__ == "__main__":
-    Rinput = []
-    ui = SearchUI()
-    display(ui)
-
-
-
-# def main():
-#     global result_file, work_dir, peaklist_dir
-#     peaklist_dir = os.path.abspath("IN")
-#
-# ui = SearchUI()
-# display(ui)
-#
-#
-# # -------------------
-# # Code to create the UI
-# # --------------------
-# result_file = None
-# work_dir = None
-# peaklist_dir = None
-# searchUI = None
-# expDesignUI = None
-# Rinput = None
-#
-# if __name__ == "__main__":
-#     main()
+    main()
