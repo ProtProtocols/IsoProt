@@ -1,7 +1,6 @@
 """
-This module displays a user interface to define all settings
-required to run a MS/MS search and the subsequent label-free
-analysis.
+This module provides the complete functionality to run a MS/MS search
+and convert the results into a TSV-formatted text file.
 
 Input (search_in):
   :key workdir: Absolute path to the working directory to use
