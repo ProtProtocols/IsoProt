@@ -15,6 +15,7 @@ Input (search_in):
   :key var_ptms: A list/duple of variable PTMs to include in the search
   :key fixed_ptms: A complete string definition of the fixed PTMs to use (not
                      including the labelling method).
+  :key on_search_complete: If set, this function is called once the search is complete.
 Output (search_out):
   :key result_file: Path to the (TSV) result file.
 """
@@ -50,7 +51,11 @@ def main():
 
     # create the result object
     global search_out
-    search_out["result_file"] = result_file
+    search_out = {"result_file": result_file}
+
+    # call the user defined function if set
+    if "on_search_complete" in search_in:
+        search_in["on_search_complete"]()
 
 
 def adapt_mgf_titles(filenames):
