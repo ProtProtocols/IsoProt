@@ -89,7 +89,7 @@ class SearchUI:
         self.work_dir_select = widgets.Dropdown(options={'/data/': '/data/', 'Example files': '/home/biodocker/'},
                                                 value='/home/biodocker/')
         self.work_dir_select.observe(
-            lambda change: self.updateFastaFiles(change["new"]), type='change', names='name'
+            lambda change: self.updateFastaFiles(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None
         )
 
         # basic search settings
@@ -244,7 +244,7 @@ class SearchUI:
         :return:
         """
         search_config = dict()
-        search_config["workdir"] = self.work_dir_select.value
+        search_config["workdir"] = self.get_work_dir()
         search_config["precursor_tolerance"] = self.precursor_tolerance.value
         search_config["fragment_tolerance"] = self.fragment_tolerance.value
         search_config["fasta_db"] = self.fasta_db.value
