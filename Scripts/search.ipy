@@ -36,6 +36,8 @@ def main():
 
     global search_in
 
+    # TODO: make sure that the input directory contains MGF files
+
     # automatically launch the search
     result_file = run(work_dir=search_in["workdir"],
                       fasta_db_path=search_in["fasta_db"],
