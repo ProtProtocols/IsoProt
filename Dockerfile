@@ -1,10 +1,6 @@
-FROM veitveit/protprotocols_template:latest
+FROM jupyter
 
 USER root
-
-# Install libraries needed by isobar, ...
-RUN apt-get update &&   apt-get install -y apt-transport-https libxml2-dev r-cran-rmysql libnetcdf-dev libmariadb-client-lgpl-dev
-#&&  echo "deb https://cran.wu.ac.at/bin/linux/ubuntu xenial/" >> /etc/apt/sources.list &&  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 &&  apt-get update &&    apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev r-base r-base-dev 
 
 # Setup R
 ADD DockerSetup/install_packages.R /tmp/
@@ -14,7 +10,11 @@ RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 RUN pip3 install psutil
 
 # Install Mono
-RUN apt-get update && apt-get install -y mono-complete
+RUN apt-get update \
+ && apt-get install -y mono-complete \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 
 # Install SearchGui and PeptideShaker
 USER biodocker
