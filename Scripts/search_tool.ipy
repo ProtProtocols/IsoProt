@@ -1,0 +1,642 @@
+"""
+This file contains the complete python code to display a user interface in a
+Jupyter cell and allows user to perform an MS/MS database search.
+
+All searchGUI and PeptideShaker functions used in this workflow are called and
+managed through this file.
+"""
+
+import ipywidgets as widgets
+from ipywidgets import VBox, Label
+import os
+import subprocess
+import psutil
+import pandas as pd
+from IPython.display import Javascript, display
+import json
+
+
+class SearchUI:
+    """
+    Class used to manage the search specific user interface.
+    """
+    def __init__(self):
+        """
+        Initializes the SearchUI object and creates all user interface
+        objects as member variables.
+        """
+        # working directory
+        self.work_dir_select = widgets.Dropdown(options={'/data/': '/data/', 'Example files': '/home/biodocker/'},
+                                                value='/home/biodocker/')
+        self.work_dir_select.observe(observe_work_dir_select)
+
+        # basic search settings
+        self.precursor_tolerance = widgets.IntSlider(min=-10, max=30, step=1, value=10)
+        self.fragment_tolerance = widgets.BoundedFloatText(min=0, max=200, value=0.05)
+        self.fasta_db = widgets.Dropdown(options={"sp_human.fasta": "IN/sp_human.fasta"})
+
+        self.generate_decoy = widgets.Checkbox(value=True, description="Generate decoy sequences")
+        self.target_fdr = widgets.BoundedFloatText(min=0, max=1, value=0.01)
+
+        # TODO  needs table to describe labeling formats
+        self.labelling = widgets.Dropdown(options=
+                                          {'TMT6': 'TMT 6-plex of K,TMT 6-plex of peptide N-term',
+                                           'TMT10': 'TMT 10-plex of K,TMT 10-plex of peptide N-term',
+                                           'iTRAQ4 (Y fixed)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of Y,iTRAQ 4-plex of peptide N-term',
+                                           'iTRAQ4 (Y variable)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of peptide N-term',
+                                           'iTRAQ8 (Y fixed)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term',
+                                           'iTRAQ8 (Y variable)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of peptide N-term'},
+                                          value='TMT 10-plex of K,TMT 10-plex of peptide N-term')
+
+        self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
+        self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
+
+        # PTMs
+        self.var_ptms = widgets.SelectMultiple(
+            options=["Oxidation of M",
+                     "Phosphorylation of STY",
+                     "Acetylation of peptide N-term",
+                     "Acetylation of protein N-term"],
+            value=['Oxidation of M'])
+
+        self.spectra_dir = widgets.Dropdown(options={"IN": "IN"})
+
+        # basic stat input fields
+        self.summarization_method = widgets.Dropdown(options=
+                                                     {"Median of all PSMs": "median",
+                                                      "Average of all PSMs": "average",
+                                                      "Top 3 PSMs (Median)": "top3",
+                                                      "iBAQ to combine peptides": "ibaq"},
+                                                     value='ibaq')
+        self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
+        self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
+
+        # button to show experimental design
+        self.exp_des_button = widgets.Button(
+            description='Enter design',
+            disabled=False,
+            button_style='',  # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Enter experimental design',
+            icon='check'
+        )
+
+        self.exp_des_button.on_click(show_exp_design)
+
+    def updateFastaFiles(self, workdir):
+        """
+        Update the drop-down list that lists all available FASTA files found in the
+        current input directory.
+        :param workdir: The current working directory used to search for FASTA files.
+        """
+        # get all FASTA files
+        fasta_files = [file for file in os.listdir(workdir) if file[-6:] == ".fasta"]
+
+        # also search all subdirectories for FASTA files
+        for d in os.listdir(workdir):
+            d_path = os.path.join(workdir, d)
+            if os.path.isdir(d_path) and d[0] != ".":
+                fasta_files += [os.path.join(d, file) for file in os.listdir(d_path) if file[-6:] == ".fasta"]
+
+        # create the dict to add as values to the control
+        file_list = dict()
+        sel_value = None
+
+        for f in fasta_files:
+            file_list[f] = os.path.join(os.path.abspath(workdir), f)
+            if sel_value is None:
+                sel_value = os.path.join(os.path.abspath(workdir), f)
+
+        self.fasta_db.options = file_list
+        self.fasta_db.value = sel_value
+
+        # update the list of possible peaklist directories
+        directories = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d)) and d[0] != "."]
+
+        dir_list = dict()
+
+        for d in directories:
+            dir_list[d] = os.path.join(os.path.abspath(workdir), d)
+
+        self.spectra_dir.options = dir_list
+
+        if "IN" in dir_list:
+            self.spectra_dir.value = dir_list["IN"]
+
+    def display(self):
+        """
+        Displays the search user interface.
+        """
+        self.updateFastaFiles(self.work_dir_select.value)
+
+        settings_box = VBox([Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
+                             Label('Fragment ion tolerance (da):'), self.fragment_tolerance,
+                             Label('Number of miscleavages;'), self.missed_cleavages,
+                             Label('Further fixed modifications'), self.fixed_ptms,
+                             Label('Further variable modifications (Hold Ctrl to select multiple)'), self.var_ptms,
+                             Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
+                             self.generate_decoy,
+                             Label('Target (protein, peptide, and PSM) FDR:'), self.target_fdr,
+                             Label('Quantification method:'), self.labelling,
+                             Label('Summarization method:'), self.summarization_method,
+                             Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
+                             self.use_ptms_for_quant,
+                             Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
+                             Label('Folder for spectra files (files need to be mgf)'), self.spectra_dir,
+                             Label('Note: When entering the experimental design, the working directory and '
+                                   'labelling method can no longer be changed.'),
+                             self.exp_des_button])
+
+        display(settings_box)
+
+    def save_config(self, file):
+        """
+        Save all configurations set by the user into a JSON formatted
+        text file.
+        :param: file: The name of the target file to use. Will be overwritten if it exists.
+        """
+        search_config = dict()
+        search_config["work_dir"] = self.work_dir_select.value
+        search_config["precursor_tolerance"] = self.precursor_tolerance.value
+        search_config["fragment_tolerance"] = self.fragment_tolerance.value
+        search_config["fasta_file"] = self.fasta_db.value
+        search_config["generate_decoy"] = self.generate_decoy.value
+        search_config["quantification_method"] = self.labelling.value
+        search_config["missed_cleavages"] = self.missed_cleavages.value
+        search_config["fixed_mods"] = self.fixed_ptms.value
+        search_config["var_mods"] = self.var_ptms.value
+        search_config["summarization_method"] = self.summarization_method.value
+        search_config["min_protein_psms"] = self.min_protein_psms.value
+        search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
+        search_config["target_fdr"] = self.target_fdr.value
+
+        json_string = json.dumps(search_config)
+
+        with open(file, "w") as writer:
+            writer.write(json_string + "\n")
+
+
+class ExpDesignUI:
+    def __init__(self, labelling_technique, exp_result_file):
+        """
+        Generates all use interface objects as member variables.
+        
+        :param labelling_technique: The labelling method used.
+        :param exp_result_file: Location of the text file where the experimental
+                            design should be saved.
+        """
+        self.result_file = exp_result_file
+
+        # always expect two groups
+        self.group1_name = widgets.Text(placeholder="Treatment", description="Group 1:")
+        self.group2_name = widgets.Text(placeholder="Control", description="Group 2:")
+
+        self.channels = {
+            'TMT6': ["126", "127", "128", "129", "130", "131"],
+            'TMT10': ["126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131"],
+            'iTRAQ4': ["114", "115", "116", "117"],
+            'iTRAQ8': ["113", "114", "115", "116", "117", "118", "119", "121"]
+        }
+
+        # removed everything in string labellign_technique after space 
+        if labelling_technique.split(" ")[0] not in self.channels:
+            raise Exception("Unknown labelling technique: '" + labelling_technique + "'")
+
+        self.labelling_technique = labelling_technique.split(" ")[0]
+
+        # generate the textfields for the channels
+        self.channel_names = list()
+
+        for channel in self.channels[self.labelling_technique]:
+            self.channel_names.append(widgets.Text(description=channel, placeholder="Sample " + channel))
+
+        # add select boxes to select the experimental group
+        self.group_selects = list()
+
+        for channel in self.channels[self.labelling_technique]:
+            self.group_selects.append(widgets.Dropdown(options=["Group 1", "Group 2"], value="Group 1"))
+
+        self.save_button = widgets.Button(
+            description='Save design',
+            disabled=False,
+            button_style='',  # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Save the experimental design',
+            icon='check'
+        )
+
+        self.save_button.on_click(self.save_design)
+
+        self.search_button_visible = False
+
+    def display(self):
+        """
+        Displays the user interface to enter the experimental design.
+        """
+        widget_list = [widgets.Label("Treatment group names:"), self.group1_name, self.group2_name,
+                       widgets.Label("Sample names (per channel):")]
+
+        for i in range(0, len(self.channel_names)):
+            widget_list.append(widgets.HBox([self.channel_names[i], self.group_selects[i]]))
+
+        widget_list.append(self.save_button)
+
+        widget_box = VBox(widget_list)
+
+        display(widget_box)
+
+    def save_design(self, button):
+        """
+        Save the experimental design as a TSV file.
+        :param button: The button that triggered the function.
+        """
+        # get all names
+        sample_names = [s.value if s.value != "" else s.placeholder for s in self.channel_names]
+        sample_group = [g.value for g in self.group_selects]
+        channel_names = self.channels[self.labelling_technique]
+
+        # TODO: make sure all sample names are filled in
+
+        # replace the group names
+        for i in range(0, len(sample_group)):
+            if sample_group[i] == "Group 1":
+                sample_group[
+                    i] = self.group1_name.value if self.group1_name.value != "" else self.group1_name.placeholder
+            elif sample_group[i] == "Group 2":
+                sample_group[
+                    i] = self.group2_name.value if self.group2_name.value != "" else self.group2_name.placeholder
+
+        design_data = pd.DataFrame(
+            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group},
+        )
+
+        design_data.to_csv(path_or_buf=self.result_file, sep="\t", index=False)
+
+        # add the run search button
+        if not self.search_button_visible:
+            self.search_button = widgets.Button(
+                description='Run search',
+                disabled=False,
+                button_style='',  # 'success', 'info', 'warning', 'danger' or ''
+                tooltip='Run the search',
+                icon='check'
+            )
+
+            self.search_button.on_click(run_search)
+
+            search_box = VBox([self.search_button])
+            display(search_box)
+
+            self.search_button_visible = True
+
+
+def adapt_mgf_titles(filenames):
+    """
+    This function changes all MGF titles to [filename].[spec index]
+
+    :param: filenames: Filenames of the MGF files to change
+    """
+    for filename in filenames:
+        with open(filename, "r") as reader:
+            clean_name = os.path.basename(filename).replace(" ", "_")
+            # MGF index reference in PSI standard is 1-based
+            cur_index = 1
+
+            with open(filename + ".tmp", "w") as writer:
+                for line in reader:
+                    if line[0:6] == "TITLE=":
+                        writer.write("TITLE=" + clean_name + "." + str(cur_index) + "\n")
+                        cur_index += 1
+                    else:
+                        writer.write(line)
+
+        # backup the original file
+        os.rename(filename, filename + ".org")
+        os.rename(filename + ".tmp", filename)
+
+
+def filter_mgf_peaks(filenames, min_mz=100, max_mz=150):
+    """
+    Removes all peaks from the passed mgf files that are below min_mz or
+    above max_mz. The results are written to files with the same name but
+    ".filtered" appended to the name.
+
+    :param: filenames: List of filenames to process.
+    :param: min_mz: Minimum m/z a peak must have to be kept
+    :param: max_mz: Maximum m/z a peak may have to be kept
+    """
+    for filename in filenames:
+        with open(filename, "r") as reader:
+            with open(filename + ".filtered", "w") as writer:
+                for line in reader:
+                    # check if it's a peak
+                    if line[0].isdigit():
+                        sep_index = line.find(" ")
+                        if sep_index < 0:
+                            sep_index = line.find("\t")
+                        if sep_index < 0:
+                            raise Exception("Invalid peak definition found: " + line +
+                                            ". Failed to filter file " + filename)
+
+                        mz = float(line[:sep_index])
+
+                        # ignore any non-matching peaks
+                        if mz < min_mz or mz > max_mz:
+                            continue
+
+                    # copy the line
+                    writer.write(line)
+
+
+def show_exp_design(button):
+    """
+    Display the experimental design dialog. This function is called
+    through the button at the end of the SearchUI dialog
+    :param button: The button that triggered the function
+    """
+    global searchUI, expDesignUI
+
+    work_dir = os.path.abspath(os.path.join(searchUI.work_dir_select.value, "OUT"))
+
+    if not os.path.isdir(work_dir):
+        os.mkdir(work_dir)
+
+    # disable the exp_design button and the labelling method
+    searchUI.exp_des_button.disabled = True
+    searchUI.labelling.disabled = True
+    searchUI.work_dir_select.disabled = True
+
+    # get the currently selected labelling method
+    labelling_method = list(searchUI.labelling.options.keys())[searchUI.labelling.index]
+
+    expDesignUI = ExpDesignUI(labelling_method, exp_result_file=os.path.join(work_dir, "exp_design.tsv"))
+    expDesignUI.display()
+
+
+def run_search(button):
+    """
+    This function is triggered through the "Run search" button. It
+    contains the complete code to generate the decoy database, run
+    the search, and convert the search engine results to TSV files.
+    :param button: The button used to trigger the function.
+    :return:
+    """
+    global searchUI, result_file
+
+    # get the free memory in MB
+    free_mem = round(psutil.virtual_memory().available / 1024 / 1024)
+    # if there's more than 1G available, leave 1G for other tasks
+    if free_mem > 1000:
+        free_mem -= 1000
+
+    # make sure all required fields were selected
+    if searchUI.work_dir_select.value is None:
+        print("Error: No working directory selected")
+        return
+
+    if searchUI.fasta_db.value is None:
+        print("Error: No FASTA file selected")
+        return
+
+    # create the directory paths to work in
+    peaklist_dir = os.path.abspath(searchUI.spectra_dir.value)
+
+    if not os.path.isdir(peaklist_dir):
+        raise Exception("Invalid peak list directory selected: " + peaklist_dir + " does not exist.")
+
+    peptide_shaker_jar = "/home/biodocker/bin/PeptideShaker-1.16.17/PeptideShaker-1.16.17.jar"
+    searchgui_jar = "/home/biodocker/bin/SearchGUI-3.2.20/SearchGUI-3.2.20.jar"
+    work_dir = os.path.abspath(os.path.join(searchUI.work_dir_select.value, "OUT"))
+    exp_design_file = os.path.join(work_dir, "exp_design.tsv")
+
+    # the searches should be performed in the "OUT" directory
+    if not os.path.isdir(work_dir):
+        os.mkdir(work_dir)
+    else:
+        print("Deleting existing files in " + str(work_dir))
+        tmp_files = [f for f in os.listdir(work_dir) if os.path.isfile(os.path.join(work_dir, f))]
+        for tmp_file in tmp_files:
+            complete_name = os.path.join(work_dir, tmp_file)
+            if os.path.isfile(complete_name):
+                os.remove(complete_name)
+
+    # -------------------------------------
+    # Save the settings
+    searchUI.save_config(os.path.join(work_dir, "search_settings.json"))
+
+    # -------------------------------------
+    # Fix all MGF titles
+    print("Adapting MGF titles...")
+    mgf_filenames = [os.path.join(peaklist_dir, f) for f in os.listdir(peaklist_dir) if f[-4:].lower() == ".mgf"]
+    adapt_mgf_titles(mgf_filenames)
+    print(mgf_filenames)
+
+    print("Extracting reporter peaks...")
+    filter_mgf_peaks(mgf_filenames)
+
+    # -------------------------------------
+    # Generate the decoy database
+
+    if searchUI.generate_decoy.value:
+        print("Creating decoy database...")
+
+        # create the decoy database
+        subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
+                        "eu.isas.searchgui.cmd.FastaCLI", "-in", searchUI.fasta_db.value, "-decoy"], check=True,
+                       cwd=work_dir,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # get the filename of the decoy database
+        database_file = os.path.abspath(searchUI.fasta_db.value)[:-6] + "_concatenated_target_decoy.fasta"
+    else:
+        # simply use the selected database file
+        database_file = os.path.abspath(searchUI.fasta_db.value)
+
+    if not os.path.isfile(database_file):
+        raise Exception("Failed to find generated decoy database")
+
+    # ---------------------------------------------
+    # Create the search parameter file
+
+    # build the arguments to create the parameter file
+    param_file = os.path.join(work_dir, "search.par")
+
+    # remove any old parameters
+    if os.path.isfile(param_file):
+        os.remove(param_file)
+
+    search_args = list(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
+                        "eu.isas.searchgui.cmd.IdentificationParametersCLI",
+                        "-out", param_file])
+
+    # precursor tolerance
+    search_args.append("-prec_tol")
+    search_args.append(str(searchUI.precursor_tolerance.value))
+    # fragment tolerance
+    search_args.append("-frag_tol")
+    search_args.append(str(searchUI.fragment_tolerance.value))
+    # fixed mods
+    # TODO: labelling cannot always be set as fixed mod???
+    fixed_mod_string = str(searchUI.labelling.value) + "," + str(searchUI.fixed_ptms.value)
+    search_args.append("-fixed_mods")
+    search_args.append(fixed_mod_string)
+    # database
+    search_args.append("-db")
+    search_args.append(database_file)
+    # missed cleavages
+    search_args.append("-mc")
+    search_args.append(str(searchUI.missed_cleavages.value))
+
+    # var mods
+    labelling_method = list(searchUI.labelling.options.keys())[searchUI.labelling.index]
+
+    if len(searchUI.var_ptms.value) > 0 or ("Y variable" in labelling_method):
+        search_args.append("-variable_mods")
+        var_mod_list = list()
+
+        for var_mod in searchUI.var_ptms.value:
+            if var_mod == "Phosphorylation of STY":
+                var_mod_list += ["Phosphorylation of S", "Phosphorylation of T", "Phosphorylation of Y"]
+            else:
+                var_mod_list.append(var_mod)
+        if labelling_method == "iTRAQ4 (Y variable)":
+            var_mod_list.append("iTRAQ 4-plex of Y")
+        if labelling_method == "iTRAQ8 (Y variable)":
+            var_mod_list.append("iTRAQ 8-plex of Y")
+
+        search_args.append(",".join(var_mod_list))
+
+    # create the search parameter file
+    print("Creating search parameter file...")
+    # print(" ".join(search_args))
+    subprocess.run(search_args, check=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    if not os.path.isfile(param_file):
+        raise Exception("Failed to create search parameters")
+
+    # ------------------------------------------------
+    # Run the search
+    print("Running search...")
+    # TODO: create list of spectrum files - or the folder
+    spectrum_files = peaklist_dir
+    print("  Searching files in " + spectrum_files)
+    search_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", searchgui_jar,
+                                     "eu.isas.searchgui.cmd.SearchCLI", "-spectrum_files", spectrum_files,
+                                     "-output_folder", work_dir, "-id_params", param_file,
+                                     "-xtandem", "0", "-msgf", "1", "-comet", "0", "-ms_amanda", "0",
+                                     "-myrimatch", "0", "-andromeda", "0", "-omssa", "0", "-tide", "0"],
+                                    check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    universal_newlines=True)
+
+    if search_process.returncode != 0:
+        print(search_process.stdout)
+        raise Exception("Search process failed.")
+
+    print("Search completed.")
+
+    # -------------------------------------------------
+    # Run PeptideShaker
+    print("Processing result using PeptideShaker...")
+    peptide_shaker_result_file = os.path.join(work_dir, "experiment.cpsx")
+
+    peptide_shaker_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", peptide_shaker_jar,
+                                             "eu.isas.peptideshaker.cmd.PeptideShakerCLI",
+                                             "-useGeneMapping", "0",
+                                             "-experiment", "experiment1",
+                                             "-sample", "test",
+                                             "-replicate", "1",
+                                             "-identification_files", work_dir,
+                                             "-out", peptide_shaker_result_file,
+                                             "-id_params", param_file,
+                                             "-spectrum_files", spectrum_files],
+                                            check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                            universal_newlines=True)
+
+    if peptide_shaker_process.returncode != 0:
+        print(peptide_shaker_process.stdout)
+        raise Exception("Failed to run PeptideShaker")
+
+    if not os.path.isfile(peptide_shaker_result_file):
+        raise Exception("Failed to process result file.")
+
+    # ---------------------------------------------------
+    # create TSV output files
+    print("Converting result to TSV format...")
+    conversion_process = subprocess.run(["java", "-Xmx" + str(free_mem) + "M", "-cp", peptide_shaker_jar,
+                                         "eu.isas.peptideshaker.cmd.ReportCLI",
+                                         "-in", peptide_shaker_result_file,
+                                         "-out_reports", work_dir,
+                                         "-reports", "8"],
+                                        check=False, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                        universal_newlines=True)
+
+    if conversion_process.returncode != 0:
+        print(conversion_process.stdout)
+        raise Exception("Conversion process failed")
+
+    result_file = os.path.join(work_dir, "experiment1_test_1_Extended_PSM_Report.txt")
+
+    if not os.path.isfile(result_file):
+        raise Exception("Error: Conversion failed")
+
+    # create parameter list as input for R script
+    global Rinput
+    Rinput = [searchUI.labelling.value, searchUI.spectra_dir.value, work_dir,
+              searchUI.summarization_method.value, searchUI.min_protein_psms.value,
+              searchUI.use_ptms_for_quant.value, searchUI.target_fdr.value]
+
+    print("Done.")
+
+    on_search_completed()
+
+
+def on_search_completed():
+    """
+    This function is called once the search is successfully complete.
+    """
+    global Rinput, expDesignUI
+
+    # disable previous steps
+    expDesignUI.search_button.disabled = True
+    expDesignUI.save_button.disabled = True
+
+    # add the new button to run the R scripts
+    run_quant_button = widgets.Button(
+        description="Run quantification and peptide inference",
+        layout=widgets.Layout(width='30%'))
+
+    run_quant_button.on_click(run_next_cells)
+    display(run_quant_button)
+
+
+def run_next_cells(button):
+    # Run the javascript code to launch the next cell
+    display(
+        Javascript(
+            'IPython.notebook.execute_cell_range(IPython.notebook.get_selected_index()+1, IPython.notebook.get_selected_index()+6)'))
+
+
+def observe_work_dir_select(change):
+    global work_dir_select
+    if change['type'] == "change" and change['name'] == "value":
+        # update the required UI controls
+        searchUI.updateFastaFiles(change["new"])
+
+
+def main():
+    global result_file, work_dir, peaklist_dir
+    peaklist_dir = os.path.abspath("IN")
+
+    searchUI = SearchUI()
+    searchUI.display()
+
+
+# -------------------
+# Code to create the UI
+# --------------------
+result_file = None
+work_dir = None
+peaklist_dir = None
+searchUI = None
+expDesignUI = None
+
+if __name__ == "__main__":
+    main()

@@ -3,6 +3,8 @@ peptide.ratios.rds
 protein.ratios.rds
 t.corr.csv
 *.swp
+.ipynb_checkpoints
+.idea
 
 Test/*.canno
 Test/*.cnlcp
@@ -10,3 +12,4 @@ Test/*.csarr
 Test/*.cseq
 Test/*.cui
 Test/sp_human_concatenated_target_decoy.fasta
+LocalTest

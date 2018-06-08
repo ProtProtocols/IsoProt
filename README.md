@@ -1,50 +1,32 @@
 # IsoLabeledProtocol
 
-This project is still in a development stage. All resources are only intended to be used for testing.
+This project provides a reproducible pipeline to analyse isobarically labelled mass spectrometry based quantitative proteomics data.
 
-## Installation
+The different workflows are created using the [jupyter notebook](http://jupyter.org) environment. They look like normal documents with interactive elements (like buttons, etc.) in them and are based on our [standrad workflow template](https://github.com/ProtProtocols/protprotocols_template). Thereby, they also provide completely reproducible records of the bioinformatic pipeline used to analyse the data.
 
-To build the Docker image on a linux (tested on Ubuntu) system you can use the `DockerSetup/rebuild_docker.sh` script.
+The pipelines are made available as [Docker](https://www.docker.com) containers. These are light-weight virtual machines that contain the complete software necessary to run the pipeline. Thereby, you do not have to worry about installing any additional required software.
 
-This script is expected to be executed from the root directory and you might have to make it executable (or just write _bash_ before the following command):
+This project is **still under development**. All resources are only intended to be used for testing. We are simply not done yet.
 
+## Usage
+- You need to have docker installed. For more details, see https://docs.docker.com/engine/installation/
+
+The following commands have to be execute in your operating systems command prompt.
+
+- Get the docker image (you might need to be administrator): 
 ```bash
-test@mashine:/tmp/IsoLabeledProtocol$ DockerSetup/rebuild_docker.sh
+docker pull veitveit/isolabeledprotocol:latest
 ```
 
-## Testing
-
-To launch the docker image you can use `Test/run_docker.sh` script (remember to make it executable). Again, this was only tested on Ubuntu.
-
-To then launch the pipeline use:
-
+- Run the image
 ```bash
-# Run the search
-biodocker@JG-T460s:/data$ Scripts/pipeline.sh -d Test/sp_human.fasta -p 20 -f 0.05 -c 1 Test/test.mgf
-
-# Analyse the result
-biodocker@JG-T460s:/data$ Rscript Scripts/isobar_analysis.R pipeline-test/experiment1_test_1_Extended_PSM_Report.txt pipeline-test/test.mgf
+docker run -it -p 8888:8888 veitveit/isolabeledprotocol:latest
 ```
 
-Sensible quantitation results can be generated using the `test_big.mgf` file.
+- Open your favorite web browser and access the image via 0.0.0.0:8888
 
-## Structure
+- You can start with the example use case by clicking on the file Example.ipynb
 
-The repository is structured in the following way:
+## Feedback
 
-  * **DockerSetup:** Files / Scripts required to build the docker image
-  * **Test**: Files and Scripts used for testing the pipeline
-  * **Scripts**: The analysis pipeline related scripts. These scripts are currently not added to the docker image to simplify the development. At a later stage, these should be included in the image.
-
-## ToDo
-
-  - [ ] Change statically typed variables to command line parameters
-  - [ ] Replace isobar version with one of our's
-  - [ ] Output files, which folder structure?
-
-Planned features:
-
-  - [ ] Add support for more complex experimental setups (ie. grouping of channels)
-    - This probably requires a web-based interface to take the different numbers of channels per quant strategy into consideration
-  - [ ] Replace `pipeline.sh` script by web-based Python application
-  - [ ] Add RShiny based result viewer application
+In case you have any questions about using the pipeline or find an issue, please simply [submit an issue](https://github.com/ProtProtocols/IsoLabeledProtocol/issues) through this GitHub page.

@@ -1,0 +1,57 @@
+"""
+This module simply displays a button to execute the N next cells
+
+Input (btn_next_cell_in):
+  :key description: The text to appear on the button (default: "Run next cells")
+  :key n_cells_to_run: The number of next cells to execute (default: 1)
+Output (btn_next_cell_out):
+  :key button: The button object.
+
+Example:
+    btn_next_cell_in = {"description": "My button 2 cells", "n_cells_to_run": 2}
+
+    %run "Scripts/btn_next_cell.ipy"
+
+    # disable the button right away
+    btn_next_cell_out["button"].disabled = True
+"""
+
+import ipywidgets as widgets
+from IPython.display import Javascript, display
+
+
+global btn_next_cell_in, btn_next_cell_out
+
+
+def main():
+    global btn_next_cell_in, btn_next_cell_out
+
+    btn_desc = "Run next cells"
+    btn_n_cells = 1
+
+    if "btn_next_cell_in" in globals() and "description" in btn_next_cell_in:
+        btn_desc = btn_next_cell_in["description"]
+    if "btn_next_cell_in" in globals() and "n_cells_to_run" in btn_next_cell_in:
+        btn_n_cells = btn_next_cell_in["n_cells_to_run"]
+
+    # increase the number of cells to run +1 as it's used as an index
+    btn_n_cells += 1
+
+    # add the new button to run the R scripts
+    btn_next_cell = widgets.Button(
+        description=btn_desc,
+        layout=widgets.Layout(width='30%'))
+
+    btn_next_cell.on_click(lambda _: display(
+        # Run the javascript code to launch the next cell
+        Javascript(
+            'IPython.notebook.execute_cell_range(IPython.notebook.get_selected_index()+1, IPython.notebook.get_selected_index()+' + str(btn_n_cells) + ')')
+    ))
+
+    btn_next_cell_out = {"button": btn_next_cell}
+
+    display(btn_next_cell)
+
+
+if __name__ == "__main__":
+    main()
