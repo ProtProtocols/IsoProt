@@ -1,4 +1,4 @@
-FROM jupyter
+FROM veitveit/protprotocols_template
 
 USER root
 
