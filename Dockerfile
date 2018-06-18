@@ -39,7 +39,8 @@ WORKDIR /home/biodocker/
 
 COPY Example.ipynb .
 #COPY Example_isobar.ipynb .
-COPY Scripts ./
+RUN mkdir Scripts
+COPY Scripts/ Scripts/
 COPY Test/iTRAQCancer.mgf IN
 COPY Test/sp_human.fasta IN
 
