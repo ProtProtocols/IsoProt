@@ -108,7 +108,7 @@ class SearchUI:
                                            'iTRAQ4 (Y variable)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of peptide N-term',
                                            'iTRAQ8 (Y fixed)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term',
                                            'iTRAQ8 (Y variable)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of peptide N-term'},
-                                          value='TMT 10-plex of K,TMT 10-plex of peptide N-term')
+                                          value='iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term')
 
         self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
