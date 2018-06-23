@@ -143,8 +143,8 @@ class SearchUI:
         )
 
         self.exp_des_button.on_click(lambda _: self.show_exp_design())
-
-        self.expDesignUI = ExpDesignUI(self)
+        # create the expDesignUI object once the search UI is being displayed
+        self.expDesignUI = None
 
     def get_work_dir(self):
         return os.path.abspath(os.path.join(self.work_dir_select.value, "OUT"))
@@ -164,6 +164,7 @@ class SearchUI:
         self.work_dir_select.disabled = True
 
         # self.tab.selected_index = 1
+        self.expDesignUI = ExpDesignUI(self)
         display(self.expDesignUI.get_root_widget())
 
     def updateFastaFiles(self, workdir):
