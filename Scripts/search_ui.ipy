@@ -25,6 +25,7 @@ Output (search_ui_out):
     :key use_ptms_for_quant: Indicates whether PTMs should be used for the quantification.
     :key target_fdr: Target FDR to use (all levels).
     :key spec_file_dir: Path to the spectrum directory.
+    :key num_groups: Number of experimental conditions.
 """
 
 import ipywidgets as widgets
@@ -108,7 +109,7 @@ class SearchUI:
                                            'iTRAQ4 (Y variable)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of peptide N-term',
                                            'iTRAQ8 (Y fixed)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term',
                                            'iTRAQ8 (Y variable)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of peptide N-term'},
-                                          value='TMT 10-plex of K,TMT 10-plex of peptide N-term')
+                                          value='iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term')
 
         self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
@@ -133,6 +134,10 @@ class SearchUI:
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
 
+        # get number of experimental conditions
+        self.number_groups = widgets.IntSlider(min=2, max=20, step=1, value=2)
+
+
         # button to show experimental design
         self.exp_des_button = widgets.Button(
             description='Enter design',
@@ -143,8 +148,8 @@ class SearchUI:
         )
 
         self.exp_des_button.on_click(lambda _: self.show_exp_design())
-
-        self.expDesignUI = ExpDesignUI(self)
+        # create the expDesignUI object once the search UI is being displayed
+        self.expDesignUI = None
 
     def get_work_dir(self):
         return os.path.abspath(os.path.join(self.work_dir_select.value, "OUT"))
@@ -164,6 +169,7 @@ class SearchUI:
         self.work_dir_select.disabled = True
 
         # self.tab.selected_index = 1
+        self.expDesignUI = ExpDesignUI(self)
         display(self.expDesignUI.get_root_widget())
 
     def updateFastaFiles(self, workdir):
@@ -208,6 +214,8 @@ class SearchUI:
         if "IN" in dir_list:
             self.spectra_dir.value = dir_list["IN"]
 
+
+
     def display(self):
         """
         Displays the search user interface.
@@ -228,6 +236,7 @@ class SearchUI:
                            self.use_ptms_for_quant,
                            Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
                            Label('Folder for spectra files (files need to be mgf)'), self.spectra_dir,
+                           Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
                            Label('Note: When entering the experimental design, the working directory and '
                                  'labelling method can no longer be changed.'),
                            self.exp_des_button])
@@ -259,6 +268,7 @@ class SearchUI:
         search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
         search_config["target_fdr"] = self.target_fdr.value
         search_config["input_directory"] = self.spectra_dir.value
+        search_config["number_groups"] = self.number_groups
 
         return search_config
 
@@ -288,9 +298,14 @@ class ExpDesignUI:
 
         self.result_file_path = os.path.join(searchUI.get_work_dir(), "exp_design.tsv")
 
-        # always expect two groups
-        self.group1_name = widgets.Text(placeholder="Treatment", description="Group 1:")
-        self.group2_name = widgets.Text(placeholder="Control", description="Group 2:")
+
+        self.group_names = list()
+        self.group_ids = list()
+        self.group_names.append(widgets.Text(placeholder="Control", description="Group 1:"))
+        self.group_ids.append("Group 1")
+        for group in range(1,searchUI.number_groups.value ):
+            self.group_names.append(widgets.Text(placeholder="Treatment " + str(group), description="Group " + str(group+1) + ":"))
+            self.group_ids.append("Group " + str(group+1))
 
         self.channels = {
             'TMT6': ["126", "127", "128", "129", "130", "131"],
@@ -314,9 +329,10 @@ class ExpDesignUI:
 
         # add select boxes to select the experimental group
         self.group_selects = list()
-
+        
+        
         for channel in self.channels[self.labelling_technique]:
-            self.group_selects.append(widgets.Dropdown(options=["Group 1", "Group 2"], value="Group 1"))
+            self.group_selects.append(widgets.Dropdown(options=self.group_ids, value="Group 1"))
 
         self.save_button = widgets.Button(
             description='Save design',
@@ -334,8 +350,10 @@ class ExpDesignUI:
         """
         Displays the user interface to enter the experimental design.
         """
-        widget_list = [widgets.Label("Treatment group names:"), self.group1_name, self.group2_name,
-                       widgets.Label("Sample names (per channel):")]
+        widget_list = list()
+        widget_list.append(widgets.Label("Treatment group names:"))
+        widget_list.extend(self.group_names)
+        widget_list.append(widgets.Label("Sample names (per chanel):"))
 
         for i in range(0, len(self.channel_names)):
             widget_list.append(widgets.HBox([self.channel_names[i], self.group_selects[i]]))
@@ -355,20 +373,23 @@ class ExpDesignUI:
 
         # get all names
         sample_names = [s.value if s.value != "" else s.placeholder for s in self.channel_names]
-        sample_group = [g.value for g in self.group_selects]
         channel_names = self.channels[self.labelling_technique]
-
-        # TODO: make sure all sample names are filled in
+        sample_group = [g.value for g in self.group_selects]
+        sample_group_names = list()
 
         # replace the group names
         for i in range(0, len(sample_group)):
-            if sample_group[i] == "Group 1":
-                sample_group[
-                    i] = self.group1_name.value if self.group1_name.value != "" else self.group1_name.placeholder
-            elif sample_group[i] == "Group 2":
-                sample_group[
-                    i] = self.group2_name.value if self.group2_name.value != "" else self.group2_name.placeholder
+            ind = int(sample_group[i].replace("Group ","")) -1 
+            sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
+  
 
+        print(channel_names)
+        print(sample_names)
+        print(sample_group_names)
+        print(sample_group)
+
+
+        # TODO: missing file names
         design_data = pd.DataFrame(
             data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group},
         )
