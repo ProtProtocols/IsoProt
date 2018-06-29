@@ -7,7 +7,8 @@ ADD DockerSetup/install_packages.R /tmp/
 RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 
 # Install python packages
-RUN pip3 install psutil
+RUN pip3 install psutil && \
+    pip3 install pandas
 
 # Install Mono
 RUN apt-get update \
