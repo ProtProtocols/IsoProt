@@ -383,15 +383,9 @@ class ExpDesignUI:
             sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
   
 
-        print(channel_names)
-        print(sample_names)
-        print(sample_group_names)
-        print(sample_group)
-
-
         # TODO: missing file names
         design_data = pd.DataFrame(
-            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group},
+            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group, 'sample_orig': sample_group_names},
         )
 
         design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)
