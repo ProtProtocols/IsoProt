@@ -268,7 +268,7 @@ class SearchUI:
         search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
         search_config["target_fdr"] = self.target_fdr.value
         search_config["input_directory"] = self.spectra_dir.value
-        search_config["number_groups"] = self.number_groups
+        search_config["number_groups"] = self.number_groups.value
 
         return search_config
 
