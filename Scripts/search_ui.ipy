@@ -127,10 +127,11 @@ class SearchUI:
         # basic stat input fields
         self.summarization_method = widgets.Dropdown(options=
                                                      {"Median of all PSMs": "median",
-                                                      "Average of all PSMs": "average",
-                                                      "Top 3 PSMs (Median)": "top3",
-                                                      "iBAQ to combine peptides": "ibaq"},
-                                                     value='ibaq')
+                                                      "Average of all PSMs": "mean",
+                                                      "Median with removal of outliers": "medpolish",
+                                                      "iPQF: weighted by peptide features (also removes all proteins with missing values)": "iPQF",
+                                                      "Robust summarization (linear model rlm)" : "robust"},
+                                                     value='iPQF')
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
 
