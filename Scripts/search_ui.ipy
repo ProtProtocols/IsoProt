@@ -223,20 +223,24 @@ class SearchUI:
         """
         self.updateFastaFiles(self.work_dir_select.value)
 
-        search_box = VBox([Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
+        search_box = VBox([widgets.HTML(
+    value="<h4>Folders and files</h4>"),
+                           Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
+                           self.generate_decoy,
+                           Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
+                           Label('Folder for spectra files (files need to be mgf)'), self.spectra_dir,
+                               widgets.HTML(value="<h4>Database search</h4>"),
+        Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
                            Label('Fragment ion tolerance (da):'), self.fragment_tolerance,
                            Label('Number of miscleavages;'), self.missed_cleavages,
                            Label('Further fixed modifications'), self.fixed_ptms,
                            Label('Further variable modifications (Hold Ctrl to select multiple)'), self.var_ptms,
-                           Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
-                           self.generate_decoy,
                            Label('Target (protein, peptide, and PSM) FDR:'), self.target_fdr,
                            Label('Quantification method:'), self.labelling,
+                               widgets.HTML(value="<h4>Quantification</h4>"),
                            Label('Summarization method:'), self.summarization_method,
                            Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
                            self.use_ptms_for_quant,
-                           Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
-                           Label('Folder for spectra files (files need to be mgf)'), self.spectra_dir,
                            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
                            Label('Note: When entering the experimental design, the working directory and '
                                  'labelling method can no longer be changed.'),
