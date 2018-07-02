@@ -49,6 +49,8 @@ USER root
 
 RUN chown -R biodocker .
 
+RUN ln -s /data data
+
 # Testing
 #RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install --user && pip ins#tall jupyter_nbextensions_configurator && jupyter nbextensions_configurator enable --sys-prefix 
 #COPY notebook.json .jupyter/nbconfig/
