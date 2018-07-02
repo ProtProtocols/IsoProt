@@ -385,7 +385,7 @@ class ExpDesignUI:
 
         # TODO: missing file names
         design_data = pd.DataFrame(
-            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group, 'sample_orig': sample_group_names},
+            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group, 'sample_orig': sample_group_names, 'spec_dir': self.searchUI.spectra_dir.value},
         )
 
         design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)
