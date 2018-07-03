@@ -8,7 +8,8 @@ RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 
 # Install python packages
 RUN pip3 install psutil && \
-    pip3 install pandas
+    pip3 install pandas && \
+    pip3 install tzlocal
 
 # Install Mono
 RUN apt-get update \
