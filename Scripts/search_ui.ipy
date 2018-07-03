@@ -129,7 +129,7 @@ class SearchUI:
                                                      {"Median of all PSMs": "median",
                                                       "Average of all PSMs": "mean",
                                                       "Median with removal of outliers": "medpolish",
-                                                      "iPQF: weighted by peptide features (also removes all proteins with missing values)": "iPQF",
+                                                      "iPQF: weighted by peptide features (removes all proteins with missing values)": "iPQF",
                                                       "Robust summarization (linear model rlm)" : "robust"},
                                                      value='iPQF')
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
