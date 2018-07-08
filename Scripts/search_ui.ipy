@@ -24,12 +24,12 @@ Output (search_ui_out):
     :key min_protein_psms: Minimum PSMs per protein required.
     :key use_ptms_for_quant: Indicates whether PTMs should be used for the quantification.
     :key target_fdr: Target FDR to use (all levels).
-    :key spec_file_dir: Path to the spectrum directory.
+    :key spec_file_dir: Path to the spectrum directories (or base directory when one MS sample type).
     :key num_groups: Number of experimental conditions.
 """
 
 import ipywidgets as widgets
-from ipywidgets import VBox, Label
+from ipywidgets import VBox, Label, Layout, Text
 import os
 import pandas as pd
 from IPython.display import Javascript, display
@@ -93,6 +93,7 @@ class SearchUI:
             lambda change: self.updateFastaFiles(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None
         )
 
+
         # basic search settings
         self.precursor_tolerance = widgets.IntSlider(min=-10, max=30, step=1, value=10)
         self.fragment_tolerance = widgets.BoundedFloatText(min=0, max=200, value=0.05)
@@ -122,7 +123,13 @@ class SearchUI:
                      "Acetylation of protein N-term"],
             value=['Oxidation of M'])
 
-        self.spectra_dir = widgets.Dropdown(options={"IN": "IN"})
+        self.spectra_dir = widgets.Dropdown(options={'IN': 'IN', 'data' : 'data'}, value='IN')
+        
+        self.spectra_dir.observe(lambda change: self.updateSpectraDir(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None)
+        
+        # variable to store main folder or multiple folders with mgf files
+        self.spectra_file_dirs = "IN"
+
 
         # basic stat input fields
         self.summarization_method = widgets.Dropdown(options=
@@ -151,9 +158,18 @@ class SearchUI:
         self.exp_des_button.on_click(lambda _: self.show_exp_design())
         # create the expDesignUI object once the search UI is being displayed
         self.expDesignUI = None
+        
+        # Placeholder for warnings
+        self.warnings_note = widgets.HTML("")
 
     def get_work_dir(self):
         return os.path.abspath(os.path.join(self.work_dir_select.value, "OUT"))
+
+    def get_spectra_file_dirs(self):
+        spectra_dirs = list()
+        for i in range(0,len(self.spectra_file_dirs)):
+            spectra_dirs.append(os.path.basename(self.spectra_file_dirs[i]))
+        return list(spectra_dirs)
 
     def get_labelling_method(self):
         return list(self.labelling.options.keys())[self.labelling.index]
@@ -179,6 +195,7 @@ class SearchUI:
         current input directory.]
         :param workdir: The current working directory used to search for FASTA files.
         """
+        
         # get all FASTA files
         fasta_files = [file for file in os.listdir(workdir)
                                if file.endswith(".fasta") and ('decoy' not in file)]
@@ -215,13 +232,52 @@ class SearchUI:
         if "IN" in dir_list:
             self.spectra_dir.value = dir_list["IN"]
 
-
+    def updateSpectraDir(self, spectradir):
+        """
+        check the spectradir folder for subfolders and whether they contain mgf files 
+        and thus define multiple MS runs
+        param: spectradir folder where spectra are stored
+        """
+        if spectradir == None:
+            spectradir = 'IN'
+        spectradir = os.path.abspath(spectradir)
+        dirList = os.listdir(spectradir)
+        sampledirs = []
+        mgf_files_basedir = 0
+    
+        for file in dirList:
+            if os.path.isfile(os.path.join(os.path.abspath(spectradir), file)):
+                #print(file)
+                if file.endswith(".mgf"):
+                  mgf_files_basedir += 1
+            if os.path.isdir(os.path.join(os.path.abspath(spectradir), file)):
+                for file2 in os.listdir(spectradir + "/" + file):
+                    if file2.endswith(".mgf"):
+                      sampledirs.append(os.path.join(os.path.abspath(spectradir), file))
+        #print("mgf files in base folder: " + str(mgf_files_basedir))
+        #print("directories with mgf-files: " + str(sampledirs))
+        if mgf_files_basedir > 0 and len(sampledirs) > 0:
+            self.warning_note = widgets.HTML('<font color="red">Place mgf-files either in the main folder or in separate subfolders when having the sample distributed over multiple iTRAQ/TMT runs!</font>')
+            self.exp_des_button.disabled=True
+        elif mgf_files_basedir == 0 and len(sampledirs) == 0:
+            self.warning_note = widgets.HTML('<font color="red">No mgf-files!</font>')            
+            self.exp_des_button.disabled=True
+        else:
+            self.exp_des_button.disabled=False
+            self.warning_note = widgets.HTML("")
+            if len(sampledirs) > 0:
+                self.spectra_file_dirs = sampledirs
+            else:
+                self.spectra_file_dirs = list()
+                self.spectra_file_dirs.append(spectradir)
+           
 
     def display(self):
         """
         Displays the search user interface.
         """
         self.updateFastaFiles(self.work_dir_select.value)
+        self.updateSpectraDir(self.spectra_dir.value)
 
         search_box = VBox([widgets.HTML(
     value="<h4>Folders and files</h4>"),
@@ -244,6 +300,7 @@ class SearchUI:
                            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
                            Label('Note: When entering the experimental design, the working directory and '
                                  'labelling method can no longer be changed.'),
+                           self.warning_note,
                            self.exp_des_button])
 
         ui = search_box
@@ -272,7 +329,7 @@ class SearchUI:
         search_config["min_protein_psms"] = self.min_protein_psms.value
         search_config["use_ptms_for_quant"] = self.use_ptms_for_quant.value
         search_config["target_fdr"] = self.target_fdr.value
-        search_config["input_directory"] = self.spectra_dir.value
+        search_config["input_directory"] = self.spectra_file_dirs
         search_config["number_groups"] = self.number_groups.value
 
         return search_config
@@ -302,8 +359,13 @@ class ExpDesignUI:
         self.searchUI = searchUI
 
         self.result_file_path = os.path.join(searchUI.get_work_dir(), "exp_design.tsv")
+        
+        # in the case of multiple iTRAQ/TMT runs, get subfolders, otherwise this is main spectra folder
+        self.spectra_file_dirs = searchUI.get_spectra_file_dirs()
+        if (len(self.spectra_file_dirs) == 0):
+            raise Exception("No spectra directory")
 
-
+        # Different experimental conditions
         self.group_names = list()
         self.group_ids = list()
         self.group_names.append(widgets.Text(placeholder="Control", description="Group 1:"))
@@ -319,7 +381,7 @@ class ExpDesignUI:
             'iTRAQ8': ["113", "114", "115", "116", "117", "118", "119", "121"]
         }
 
-        # removed everything in string labellign_technique after space
+        # removed everything in string labelling_technique after space
         labelling_method = searchUI.get_labelling_method()
         if labelling_method.split(" ")[0] not in self.channels:
             raise Exception("Unknown labelling technique: '" + labelling_method + "'")
@@ -327,17 +389,17 @@ class ExpDesignUI:
         self.labelling_technique = labelling_method.split(" ")[0]
 
         # generate the textfields for the channels
+        # channel_names contains list of list with all channels given for each sample folder
         self.channel_names = list()
-
-        for channel in self.channels[self.labelling_technique]:
-            self.channel_names.append(widgets.Text(description=channel, placeholder="Sample " + channel))
-
         # add select boxes to select the experimental group
         self.group_selects = list()
-        
-        
-        for channel in self.channels[self.labelling_technique]:
-            self.group_selects.append(widgets.Dropdown(options=self.group_ids, value="Group 1"))
+        for sample_dir in range(0,len(self.spectra_file_dirs)): 
+
+            self.channel_names.append(list())
+            self.group_selects.append(list())
+            for channel in self.channels[self.labelling_technique]:
+                (self.channel_names[sample_dir]).append(widgets.Text(description=channel, placeholder="Sample " + channel))
+                (self.group_selects[sample_dir]).append(widgets.Dropdown(options=self.group_ids, value="Group 1"))
 
         self.save_button = widgets.Button(
             description='Save design',
@@ -360,8 +422,11 @@ class ExpDesignUI:
         widget_list.extend(self.group_names)
         widget_list.append(widgets.Label("Sample names (per chanel):"))
 
-        for i in range(0, len(self.channel_names)):
-            widget_list.append(widgets.HBox([self.channel_names[i], self.group_selects[i]]))
+        for sample_dir in range(0,len(self.spectra_file_dirs)): 
+            widget_list.append(widgets.HTML("<br/>"))
+            widget_list.append(widgets.HTML("Assign sample to channels in folder <b>" + self.spectra_file_dirs[sample_dir] + "</b>"))
+            for i in range(0, len(self.channel_names[sample_dir])):
+                widget_list.append(widgets.HBox([self.channel_names[sample_dir][i], self.group_selects[sample_dir][i]]))
 
         widget_list.append(self.save_button)
 
@@ -376,21 +441,28 @@ class ExpDesignUI:
         """
         global search_ui_in
 
-        # get all names
-        sample_names = [s.value if s.value != "" else s.placeholder for s in self.channel_names]
-        channel_names = self.channels[self.labelling_technique]
-        sample_group = [g.value for g in self.group_selects]
+        sample_names = list()
+        channel_names = list()
+        sample_group = list()
         sample_group_names = list()
+        sample_dir_names = list()
+        for sample_dir in range(0,len(self.spectra_file_dirs)): 
 
-        # replace the group names
-        for i in range(0, len(sample_group)):
-            ind = int(sample_group[i].replace("Group ","")) -1 
-            sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
+            # get all names
+            sample_names.extend([s.value if s.value != "" else s.placeholder for s in self.channel_names[sample_dir]])
+            channel_names.extend(self.channels[self.labelling_technique])
+            sample_group.extend([g.value for g in self.group_selects[sample_dir]])
+
+            # replace the group names
+            for i in range(0, len(self.channel_names[sample_dir])):
+                ind = int(sample_group[i].replace("Group ","")) -1 
+                sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
+                
+            sample_dir_names.extend([self.spectra_file_dirs[sample_dir]] * len(self.channel_names[sample_dir]))
   
-
-        # TODO: missing file names
+        # Write into frame and file
         design_data = pd.DataFrame(
-            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group, 'sample_orig': sample_group_names, 'spec_dir': self.searchUI.spectra_dir.value},
+            data={'channel': channel_names, 'sample_name': sample_names, 'sample_group': sample_group, 'sample_orig': sample_group_names, 'spec_dir': sample_dir_names},
         )
 
         design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)

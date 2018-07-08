@@ -6,7 +6,7 @@ Input (search_in):
   :key workdir: Absolute path to the working directory to use
   :key fasta_db_path: Absolute path to the FASTA file to use
   :key generate_decoy: Boolean to indicate whether reversed decoy sequences should be generated.
-  :key input_directory: Absolute path to the directory containing the MS/MS spectra files (in MGF format)
+  :key input_directory: Absolute path(s) to the directory(ies) containing the MS/MS spectra files (in MGF format)
   :key precursor_tolerance: The precursor tolerance in ppm
   :key fragment_tolerance: The fragment tolerance in Da
   :key labelling: The labelling PTM definition
@@ -17,7 +17,7 @@ Input (search_in):
                      including the labelling method).
   :key on_search_complete: If set, this function is called once the search is complete.
 Output (search_out):
-  :key result_file: Path to the (TSV) result file.
+  :key result_files: Path to the (TSV) result files.
 """
 
 import os
@@ -35,14 +35,24 @@ def main():
         raise Exception("Missing required settings object 'search_in'")
 
     global search_in
+    global search_out
+    
+    result_files = list()
 
-    # TODO: make sure that the input directory contains MGF files
+    # run over spectra subfolders if necessary
+    for dir in search_in["input_directory"]:
+        
+        curr_work_dir = search_in["workdir"]
+        if len(search_in["input_directory"]) > 1:
+            curr_work_dir = str(search_in["workdir"] + "/" + os.path.basename(dir))
+            if not os.path.exists(curr_work_dir):os.mkdir(curr_work_dir)
+        
 
-    # automatically launch the search
-    result_file = run(work_dir=search_in["workdir"],
+        # automatically launch the search
+        result_file = run(work_dir=curr_work_dir,
                       fasta_db_path=search_in["fasta_db"],
                       generate_decoy=search_in["generate_decoy"],
-                      spectra_dir=search_in["input_directory"],
+                      spectra_dir=dir,
                       precursor_tolerance=search_in["precursor_tolerance"],
                       fragment_tolerance=search_in["fragment_tolerance"],
                       labelling=search_in["labelling"],
@@ -50,10 +60,11 @@ def main():
                       missed_cleavages=search_in["missed_cleavages"],
                       var_ptms=search_in["var_ptms"],
                       fixed_ptms=search_in["fixed_ptms"])
+                    
+        result_files.append(result_file)
 
     # create the result object
-    global search_out
-    search_out = {"result_file": result_file}
+    search_out = {"result_file": result_files}
 
     # call the user defined function if set
     if "on_search_complete" in search_in:
@@ -134,7 +145,7 @@ class TaskRunner:
 
         if check_for_file:
             if not os.path.isfile(check_for_file):
-                raise Exception("Error: Result fle '%s' not found." % check_for_file)
+                raise Exception("Error: Result file '%s' not found." % check_for_file)
 
         run_time = time.time() - start_time
         # TODO explore better formatting

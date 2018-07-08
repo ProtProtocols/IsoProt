@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 2405546, 2018-03-11"
+   sodipodi:docname="FullWorkflow.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="397.97969"
+     inkscape:cy="811.02291"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="3094"
+     inkscape:window-height="1736"
+     inkscape:window-x="106"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect834"
+       width="35.814117"
+       height="19.510675"
+       x="194.30495"
+       y="83.318016"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <ellipse
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path836"
+       cx="135.57246"
+       cy="54.306168"
+       rx="19.577494"
+       ry="11.425772" />
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="13.827935"
+       x="117.78323"
+       height="19.510675"
+       width="35.814117"
+       id="rect838"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="145.58911"
+       x="171.40237"
+       height="19.510675"
+       width="35.814117"
+       id="rect840"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="200.45215"
+       y="88.562004"
+       id="text844"><tspan
+         sodipodi:role="line"
+         x="200.45215"
+         y="88.562004"
+         style="stroke-width:0.26458332"
+         id="tspan846">Protein </tspan><tspan
+         sodipodi:role="line"
+         x="200.45215"
+         y="93.853668"
+         style="stroke-width:0.26458332"
+         id="tspan850">sequences</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="200.45215"
+       y="99.621452"
+       id="text854"><tspan
+         sodipodi:role="line"
+         id="tspan852"
+         x="200.45215"
+         y="99.621452"
+         style="stroke-width:0.26458332">FASTA</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="123.74579"
+       y="20.62182"
+       id="text858"><tspan
+         sodipodi:role="line"
+         id="tspan856"
+         x="123.74579"
+         y="20.62182"
+         style="stroke-width:0.26458332">Mass spectra</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="125.48305"
+       y="27.838099"
+       id="text862"><tspan
+         sodipodi:role="line"
+         id="tspan860"
+         x="125.48305"
+         y="27.838099"
+         style="stroke-width:0.26458332">MGF</tspan></text>
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="331.32788"
+       x="-30.383419"
+       height="19.510675"
+       width="35.814117"
+       id="rect866"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="128.38947"
+       cx="188.48918"
+       id="ellipse868"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <ellipse
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="ellipse870"
+       cx="189.01834"
+       cy="186.59785"
+       rx="19.577494"
+       ry="11.425772" />
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect872"
+       width="35.814117"
+       height="19.510675"
+       x="89.737419"
+       y="81.561264"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       id="text876"
+       y="88.355148"
+       x="95.699959"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="88.355148"
+         x="95.699959"
+         id="tspan874"
+         sodipodi:role="line">Mass spectra</tspan></text>
+    <text
+       id="text880"
+       y="95.571419"
+       x="97.437241"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="95.571419"
+         x="97.437241"
+         id="tspan878"
+         sodipodi:role="line">MGF</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="122.54308"
+       y="9.0170841"
+       id="text884"><tspan
+         sodipodi:role="line"
+         id="tspan882"
+         x="122.54308"
+         y="9.0170841"
+         style="stroke-width:0.26458332">Full data</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect886"
+       width="35.814117"
+       height="19.510675"
+       x="146.35829"
+       y="82.619598"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       id="text890"
+       y="89.413483"
+       x="152.32086"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="89.413483"
+         x="152.32086"
+         id="tspan888"
+         sodipodi:role="line">Mass spectra</tspan></text>
+    <text
+       id="text894"
+       y="96.629753"
+       x="154.05812"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="96.629753"
+         x="154.05812"
+         id="tspan892"
+         sodipodi:role="line">MGF</tspan></text>
+    <text
+       id="text898"
+       y="77.808754"
+       x="145.82648"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="77.808754"
+         x="145.82648"
+         id="tspan896"
+         sodipodi:role="line">Standardized titles</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="88.187515"
+       y="77.794655"
+       id="text902"><tspan
+         sodipodi:role="line"
+         id="tspan900"
+         x="88.187515"
+         y="77.794655"
+         style="stroke-width:0.26458332">Only labeling peaks</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="125.61668"
+       y="50.818577"
+       id="text906"><tspan
+         sodipodi:role="line"
+         id="tspan904"
+         x="125.61668"
+         y="50.818577"
+         style="stroke-width:0.26458332">Conversion</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="125.23188"
+       y="58.302124"
+       id="text910"><tspan
+         sodipodi:role="line"
+         id="tspan908"
+         x="125.23188"
+         y="58.302124"
+         style="stroke-width:0.26458332">Extraction</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="179.60512"
+       y="125.41296"
+       id="text914"><tspan
+         sodipodi:role="line"
+         id="tspan912"
+         x="179.60512"
+         y="125.41296"
+         style="stroke-width:0.26458332">Database</tspan><tspan
+         sodipodi:role="line"
+         x="179.60512"
+         y="130.70462"
+         style="stroke-width:0.26458332"
+         id="tspan916">search</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="177.46696"
+       y="153.60989"
+       id="text920"><tspan
+         sodipodi:role="line"
+         id="tspan918"
+         x="177.46696"
+         y="153.60989"
+         style="stroke-width:0.26458332">Peptide to spectrum matches</tspan><tspan
+         sodipodi:role="line"
+         x="177.46696"
+         y="158.90157"
+         style="stroke-width:0.26458332"
+         id="tspan922">mzid</tspan></text>
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="244.80624"
+       cx="156.73915"
+       id="ellipse924"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <ellipse
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="ellipse926"
+       cx="8.5724678"
+       cy="377.09769"
+       rx="19.577494"
+       ry="11.425772" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="178.00151"
+       y="183.94499"
+       id="text930"><tspan
+         sodipodi:role="line"
+         id="tspan928"
+         x="178.00151"
+         y="183.94499"
+         style="stroke-width:0.26458332">FIltering</tspan><tspan
+         sodipodi:role="line"
+         x="178.00151"
+         y="189.23666"
+         style="stroke-width:0.26458332"
+         id="tspan934">Peptide assignment</tspan><tspan
+         sodipodi:role="line"
+         x="178.00151"
+         y="194.52832"
+         style="stroke-width:0.26458332"
+         id="tspan936">Conversion</tspan><tspan
+         sodipodi:role="line"
+         x="178.00151"
+         y="199.81999"
+         style="stroke-width:0.26458332"
+         id="tspan932" /></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect938"
+       width="35.814117"
+       height="19.510675"
+       x="170.69994"
+       y="204.32799"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="175.32881"
+       y="211.20648"
+       id="text942"><tspan
+         sodipodi:role="line"
+         id="tspan940"
+         x="175.32881"
+         y="211.20648"
+         style="stroke-width:0.26458332">PSMs</tspan><tspan
+         sodipodi:role="line"
+         x="175.32881"
+         y="216.49815"
+         style="stroke-width:0.26458332"
+         id="tspan944">tsv</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="120.53991"
+       y="241.94247"
+       id="text948"><tspan
+         sodipodi:role="line"
+         id="tspan946"
+         x="120.53991"
+         y="241.94247"
+         style="stroke-width:0.26458332">Assignment + quantification + normalization</tspan><tspan
+         sodipodi:role="line"
+         x="120.53991"
+         y="247.23415"
+         style="stroke-width:0.26458332"
+         id="tspan950">PSM + reporter ions</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect952"
+       width="35.814117"
+       height="19.510675"
+       x="163.29163"
+       y="263.06552"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="263.06552"
+       x="115.6666"
+       height="19.510675"
+       width="35.814117"
+       id="rect954"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="118.05862"
+       y="270.67932"
+       id="text958"><tspan
+         sodipodi:role="line"
+         id="tspan956"
+         x="118.05862"
+         y="270.67932"
+         style="stroke-width:0.26458332">quantified PSMs</tspan><tspan
+         sodipodi:role="line"
+         x="118.05862"
+         y="275.97098"
+         style="stroke-width:0.26458332"
+         id="tspan960">R object</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="166.56262"
+       y="269.47125"
+       id="text964"><tspan
+         sodipodi:role="line"
+         id="tspan962"
+         x="166.56262"
+         y="269.47125"
+         style="stroke-width:0.26458332">quantified PSMs</tspan><tspan
+         sodipodi:role="line"
+         x="166.56262"
+         y="274.76291"
+         style="stroke-width:0.26458332"
+         id="tspan966">csv</tspan></text>
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="303.0145"
+       cx="154.6225"
+       id="ellipse968"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="123.42614"
+       y="300.07358"
+       id="text972"><tspan
+         sodipodi:role="line"
+         id="tspan970"
+         x="123.42614"
+         y="300.07358"
+         style="stroke-width:0.26458332">Protein inference + summarization</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect974"
+       width="35.814117"
+       height="19.510675"
+       x="115.1374"
+       y="320.74457"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="119.46947"
+       y="327.46875"
+       id="text978"><tspan
+         sodipodi:role="line"
+         id="tspan976"
+         x="119.46947"
+         y="327.46875"
+         style="stroke-width:0.26458332">Protein abundances</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="120.27129"
+       y="334.95227"
+       id="text982"><tspan
+         sodipodi:role="line"
+         id="tspan980"
+         x="120.27129"
+         y="334.95227"
+         style="stroke-width:0.26458332">R object</tspan></text>
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="320.74457"
+       x="168.05411"
+       height="19.510675"
+       width="35.814117"
+       id="rect984"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       id="text988"
+       y="327.46875"
+       x="172.38617"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="327.46875"
+         x="172.38617"
+         id="tspan986"
+         sodipodi:role="line">Protein abundances</tspan></text>
+    <text
+       id="text992"
+       y="334.95227"
+       x="173.188"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="334.95227"
+         x="173.188"
+         id="tspan990"
+         sodipodi:role="line">csv</tspan></text>
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="287.13953"
+       cx="82.655792"
+       id="ellipse994"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="76.038177"
+       y="283.77014"
+       id="text998"><tspan
+         sodipodi:role="line"
+         id="tspan996"
+         x="76.038177"
+         y="283.77014"
+         style="stroke-width:0.26458332">QC</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1000"
+       width="35.814117"
+       height="19.510675"
+       x="38.408249"
+       y="304.8696"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="44.233109"
+       y="311.69983"
+       id="text1004"><tspan
+         sodipodi:role="line"
+         id="tspan1002"
+         x="44.233109"
+         y="311.69983"
+         style="stroke-width:0.26458332">Histograms + distributions</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="43.56493"
+       y="320.38605"
+       id="text1008"><tspan
+         sodipodi:role="line"
+         id="tspan1006"
+         x="43.56493"
+         y="320.38605"
+         style="stroke-width:0.26458332">png</tspan></text>
+    <ellipse
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="ellipse1010"
+       cx="82.655792"
+       cy="345.34775"
+       rx="19.577494"
+       ry="11.425772" />
+    <text
+       id="text1014"
+       y="341.97836"
+       x="76.038177"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="341.97836"
+         x="76.038177"
+         id="tspan1012"
+         sodipodi:role="line">QC</tspan></text>
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="363.07782"
+       x="38.408249"
+       height="19.510675"
+       width="35.814117"
+       id="rect1016"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       id="text1020"
+       y="369.90805"
+       x="44.233109"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="369.90805"
+         x="44.233109"
+         id="tspan1018"
+         sodipodi:role="line">Histograms + PCA</tspan></text>
+    <text
+       id="text1024"
+       y="378.59427"
+       x="43.56493"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="378.59427"
+         x="43.56493"
+         id="tspan1022"
+         sodipodi:role="line">png</tspan></text>
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="361.22272"
+       cx="156.73914"
+       id="ellipse1026"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="141.44467"
+       y="358.06036"
+       id="text1030"><tspan
+         sodipodi:role="line"
+         id="tspan1028"
+         x="141.44467"
+         y="358.06036"
+         style="stroke-width:0.26458332">Statistical testing</tspan></text>
+    <rect
+       ry="1.3229166"
+       rx="1.3229166"
+       y="382.65692"
+       x="115.1374"
+       height="19.510675"
+       width="35.814117"
+       id="rect1054"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       id="text1058"
+       y="389.3811"
+       x="119.46947"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="389.3811"
+         x="119.46947"
+         id="tspan1056"
+         sodipodi:role="line">Scores/pvalues</tspan></text>
+    <text
+       id="text1062"
+       y="396.86462"
+       x="120.27129"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458332"
+         y="396.86462"
+         x="120.27129"
+         id="tspan1060"
+         sodipodi:role="line">R object</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1064"
+       width="35.814117"
+       height="19.510675"
+       x="168.05411"
+       y="382.65692"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="172.38617"
+       y="389.3811"
+       id="text1068"><tspan
+         sodipodi:role="line"
+         id="tspan1066"
+         x="172.38617"
+         y="389.3811"
+         style="stroke-width:0.26458332">Scores/pvalues</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="173.188"
+       y="396.86462"
+       id="text1072"><tspan
+         sodipodi:role="line"
+         id="tspan1070"
+         x="173.188"
+         y="396.86462"
+         style="stroke-width:0.26458332">csv</tspan></text>
+    <ellipse
+       ry="11.425772"
+       rx="19.577494"
+       cy="403.55597"
+       cx="82.655792"
+       id="ellipse1074"
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="76.038177"
+       y="400.18658"
+       id="text1078"><tspan
+         sodipodi:role="line"
+         id="tspan1076"
+         x="76.038177"
+         y="400.18658"
+         style="stroke-width:0.26458332">QC</tspan></text>
+    <rect
+       style="opacity:0.5;fill:none;fill-opacity:0.65806454;stroke:#000000;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1080"
+       width="35.814117"
+       height="19.510675"
+       x="38.408249"
+       y="421.28604"
+       rx="1.3229166"
+       ry="1.3229166" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="44.233109"
+       y="428.11627"
+       id="text1084"><tspan
+         sodipodi:role="line"
+         id="tspan1082"
+         x="44.233109"
+         y="428.11627"
+         style="stroke-width:0.26458332">Volcano plot, p-q plot</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="43.56493"
+       y="436.80249"
+       id="text1088"><tspan
+         sodipodi:role="line"
+         id="tspan1086"
+         x="43.56493"
+         y="436.80249"
+         style="stroke-width:0.26458332">png</tspan></text>
+  </g>
+</svg>
