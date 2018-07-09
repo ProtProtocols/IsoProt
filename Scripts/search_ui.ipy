@@ -87,11 +87,11 @@ class SearchUI:
         """
 
         # working directory
-        self.work_dir_select = widgets.Dropdown(options={'/data/': '/data/', 'Example files': '/home/biodocker/'},
-                                                value='/home/biodocker/')
-        self.work_dir_select.observe(
-            lambda change: self.updateFastaFiles(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None
-        )
+        #self.work_dir_select = widgets.Dropdown(options={'/data/': '/data/', 'Example files (parent folder)': '/home/biodocker/'},
+        #                                        value='/home/biodocker/')
+        #self.work_dir_select.observe(
+        #    lambda change: self.updateFastaFiles(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None
+        #)
 
 
         # basic search settings
@@ -163,7 +163,7 @@ class SearchUI:
         self.warnings_note = widgets.HTML("")
 
     def get_work_dir(self):
-        return os.path.abspath(os.path.join(self.work_dir_select.value, "OUT"))
+        return os.path.abspath("OUT")
 
     def get_spectra_file_dirs(self):
         spectra_dirs = list()
@@ -183,13 +183,13 @@ class SearchUI:
         # disable the exp_design button and the labelling method
         self.exp_des_button.disabled = True
         self.labelling.disabled = True
-        self.work_dir_select.disabled = True
+        #self.work_dir_select.disabled = True
 
         # self.tab.selected_index = 1
         self.expDesignUI = ExpDesignUI(self)
         display(self.expDesignUI.get_root_widget())
 
-    def updateFastaFiles(self, workdir):
+    def updateFastaFiles(self, spectradir):
         """
         Update the drop-down list that lists all available FASTA files found in the
         current input directory.]
@@ -197,12 +197,12 @@ class SearchUI:
         """
         
         # get all FASTA files
-        fasta_files = [file for file in os.listdir(workdir)
+        fasta_files = [file for file in os.listdir(spectradir)
                                if file.endswith(".fasta") and ('decoy' not in file)]
 
         # also search all subdirectories for FASTA files
-        for d in os.listdir(workdir):
-            d_path = os.path.join(workdir, d)
+        for d in os.listdir(spectradir):
+            d_path = os.path.join(spectradir, d)
             if os.path.isdir(d_path) and d[0] != ".":
                 fasta_files += [os.path.join(d, file) for file in os.listdir(d_path)
                                                         if file.endswith(".fasta") and ('decoy' not in file)]
@@ -212,25 +212,25 @@ class SearchUI:
         sel_value = None
 
         for f in fasta_files:
-            file_list[f] = os.path.join(os.path.abspath(workdir), f)
+            file_list[f] = os.path.join(os.path.abspath(spectradir), f)
             if sel_value is None:
-                sel_value = os.path.join(os.path.abspath(workdir), f)
+                sel_value = os.path.join(os.path.abspath(spectradir), f)
 
         self.fasta_db.options = file_list
         self.fasta_db.value = sel_value
 
         # update the list of possible peaklist directories
-        directories = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d)) and d[0] != "."]
+        #directories = [d for d in os.listdir(spectradir) if os.path.isdir(os.path.join(spectradir, d)) and d[0] != "."]
 
-        dir_list = dict()
+        #dir_list = dict()
 
-        for d in directories:
-            dir_list[d] = os.path.join(os.path.abspath(workdir), d)
+        #for d in directories:
+        #    dir_list[d] = os.path.join(os.path.abspath(spectradir), d)
 
-        self.spectra_dir.options = dir_list
+        #self.spectra_dir.options = dir_list
 
-        if "IN" in dir_list:
-            self.spectra_dir.value = dir_list["IN"]
+        #if "IN" in dir_list:
+        #    self.spectra_dir.value = dir_list["IN"]
 
     def updateSpectraDir(self, spectradir):
         """
@@ -238,12 +238,17 @@ class SearchUI:
         and thus define multiple MS runs
         param: spectradir folder where spectra are stored
         """
+              
         if spectradir == None:
             spectradir = 'IN'
         spectradir = os.path.abspath(spectradir)
         dirList = os.listdir(spectradir)
         sampledirs = []
         mgf_files_basedir = 0
+        
+        
+        # updating fasta files
+        self.updateFastaFiles(spectradir)
     
         for file in dirList:
             if os.path.isfile(os.path.join(os.path.abspath(spectradir), file)):
@@ -260,7 +265,7 @@ class SearchUI:
             self.warning_note = widgets.HTML('<font color="red">Place mgf-files either in the main folder or in separate subfolders when having the sample distributed over multiple iTRAQ/TMT runs!</font>')
             self.exp_des_button.disabled=True
         elif mgf_files_basedir == 0 and len(sampledirs) == 0:
-            self.warning_note = widgets.HTML('<font color="red">No mgf-files!</font>')            
+            self.warning_note = widgets.HTML('<font color="red">No mgf-files found!</font>')            
             self.exp_des_button.disabled=True
         else:
             self.exp_des_button.disabled=False
@@ -276,17 +281,17 @@ class SearchUI:
         """
         Displays the search user interface.
         """
-        self.updateFastaFiles(self.work_dir_select.value)
+        #self.updateFastaFiles(self.work_dir_select.value)
         self.updateSpectraDir(self.spectra_dir.value)
 
         search_box = VBox([widgets.HTML(
     value="<h4>Folders and files</h4>"),
                            Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
                            self.generate_decoy,
-                           Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
-                           Label('Folder for spectra files (files need to be mgf)'), self.spectra_dir,
-                               widgets.HTML(value="<h4>Database search</h4>"),
-        Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
+                           #Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
+                           widgets.HTML('Folder for spectra files (files need to be mgf) and fasta database<br/>(remove <i>iTRAQCancer.mgf</i> when using <i>IN</i>)'), self.spectra_dir,
+                           widgets.HTML(value="<h4>Database search</h4>"),
+                           Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
                            Label('Fragment ion tolerance (da):'), self.fragment_tolerance,
                            Label('Number of miscleavages;'), self.missed_cleavages,
                            Label('Further fixed modifications'), self.fixed_ptms,
@@ -298,8 +303,7 @@ class SearchUI:
                            Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
                            self.use_ptms_for_quant,
                            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
-                           Label('Note: When entering the experimental design, the working directory and '
-                                 'labelling method can no longer be changed.'),
+                           Label('Note: When entering the experimental design, the labelling method can no longer be changed.'),
                            self.warning_note,
                            self.exp_des_button])
 
