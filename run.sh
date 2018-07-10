@@ -1,5 +1,5 @@
 
-img_name="isolabel" 
+img_name="veitveit/isolabeledprotocol" 
 if [ -n "$1" ]; then img_name=$1; fi
 
 # TODO  have an option to override with named parameter
@@ -26,7 +26,6 @@ echo $ADRESS
 # open the adress in the browser (idealy this shold go after docker run)
 # it will work, maybe a sec or two for browser to refresh
 xdg-open $ADRESS &
-
 docker run -it -p $PORT:8888 -v $data:/data/ $img_name 
 
 
