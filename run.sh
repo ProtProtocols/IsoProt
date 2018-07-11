@@ -24,6 +24,16 @@ if [ -z "${PORT}" ]; then
     exit 1
 fi
 
+# create the OUT directory
+if [ ! -d "OUT" ]; then
+    mkdir OUT
+
+    if [ $? != 0 ]; then
+        echo "Error: Failed to create result directory ('OUT')."
+        exit 1
+    fi
+fi
+
 # OK, let's hope there are no race conditions as this isn't really atomic
 
 ADRESS="http://localhost:$PORT/" 
