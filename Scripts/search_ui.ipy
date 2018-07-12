@@ -119,6 +119,9 @@ class SearchUI:
         self.var_ptms = widgets.SelectMultiple(
             options=["Oxidation of M",
                      "Phosphorylation of STY",
+                     "Deamidation of N",
+                     "Deamidation of Q",
+                     "Acetylation of K",
                      "Acetylation of peptide N-term",
                      "Acetylation of protein N-term"],
             value=['Oxidation of M'])
