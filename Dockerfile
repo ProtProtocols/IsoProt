@@ -53,7 +53,6 @@ RUN chown -R biodocker .
 
 # To allow use of folder /data mounted to the outside
 RUN ln -s /data data
-RUN ln -s /home/biodocker/OUT /data/OUT
 
 # Testing
 #RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install --user && pip ins#tall jupyter_nbextensions_configurator && jupyter nbextensions_configurator enable --sys-prefix 
