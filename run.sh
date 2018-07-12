@@ -6,6 +6,48 @@ if [ -n "$1" ]; then img_name=$1; fi
 # (my bash skills are not good enough) 
 data=`pwd`
 
+# Make sure docker is installed
+DOCKER_CMD=`command -v docker`
+
+if [ -z "${DOCKER_CMD}" ]; then
+    echo "Error: Canot find 'docker' command."
+    echo -e "To install Docker on your system please visit\nhttps://www.docker.com/community-edition"
+    exit 1
+fi
+
+# get root access
+echo "Launching docker requires root access..."
+sudo echo ""
+
+if [ $? != 0 ]; then
+    echo "Error: Failed to get root access."
+    exit 1
+fi
+
+# Make sure the image is installed
+IMG_COUNT=`sudo docker image ls | grep -c "${img_name}"`
+
+if [ ${IMG_COUNT} -lt 1 ]; then
+    echo "Docker image '${img_name}' is not installed."
+    echo -n "Do you want to install it [y/n]: "
+    read INSTALL_IMG
+    
+    if [ "${INSTALL_IMG}" != "y" ]; then
+        exit 1
+    fi
+
+    # install the image
+    sudo docker pull ${img_name}
+
+    if [ $? != 0 ]; then
+        echo "Error: Failed to install docker image."
+        exit 1
+    fi
+fi
+
+echo "Test end"
+exit 0
+
 # find  first free port 
 # There is probably a better way
 PORT=`python -c "
@@ -39,10 +81,6 @@ fi
 ADRESS="http://localhost:$PORT/" 
 echo "using port:" $PORT
 echo $ADRESS
-
-# get root access
-echo "Launching docker requires root access..."
-sudo echo ""
 
 # Launch the webbrowser with a 10 second delay
 ( sleep 10 ; xdg-open $ADRESS) &
