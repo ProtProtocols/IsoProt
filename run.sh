@@ -1,3 +1,5 @@
+#!/bin/bash
+
 
 img_name="veitveit/isolabeledprotocol" 
 if [ -n "$1" ]; then img_name=$1; fi
@@ -34,7 +36,7 @@ else
 fi
 
 # Make sure the image is installed
-IMG_COUNT=`sudo ${DOCKER_CMD} image ls | grep -c "${img_name}"`
+IMG_COUNT=`${DOCKER_CMD} image ls | grep -c "${img_name}"`
 
 if [ ${IMG_COUNT} -lt 1 ]; then
     echo "Docker image '${img_name}' is not installed."
