@@ -44,12 +44,14 @@ def main():
         
         curr_work_dir = search_in["workdir"]
         if len(search_in["input_directory"]) > 1:
-            curr_work_dir = str(search_in["workdir"] + "/" + os.path.basename(dir))
-            if not os.path.exists(curr_work_dir):os.mkdir(curr_work_dir)
-        
+            curr_work_dir = os.path.join(search_in["workdir"], os.path.basename(dir))
+            # create the working directory if it doesn't yet exist
+            if not os.path.exists(curr_work_dir):
+                os.mkdir(curr_work_dir)
 
         # automatically launch the search
-        result_file = run(work_dir=curr_work_dir,
+        result_file = run(
+                      work_dir=curr_work_dir,
                       fasta_db_path=search_in["fasta_db"],
                       generate_decoy=search_in["generate_decoy"],
                       spectra_dir=dir,
@@ -64,7 +66,7 @@ def main():
         result_files.append(result_file)
 
     # create the result object
-    search_out = {"result_file": result_files}
+    search_out = {"result_files": result_files}
 
     # call the user defined function if set
     if "on_search_complete" in search_in:

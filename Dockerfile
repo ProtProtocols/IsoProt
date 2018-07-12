@@ -2,6 +2,13 @@ FROM veitveit/protprotocols_template
 
 USER root
 
+# Install Mono - note: This must run before the R setup as packages required by R are
+# installed as well.
+RUN apt-get update \
+ && apt-get install -y mono-complete libxml2-dev libnetcdf-dev \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 # Setup R
 ADD DockerSetup/install_packages.R /tmp/
 RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
@@ -10,12 +17,6 @@ RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 RUN pip3 install psutil && \
     pip3 install pandas && \
     pip3 install tzlocal
-
-# Install Mono
-RUN apt-get update \
- && apt-get install -y mono-complete \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
 
 
 # Install SearchGui and PeptideShaker
