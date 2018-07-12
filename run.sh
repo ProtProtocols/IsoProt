@@ -15,17 +15,26 @@ if [ -z "${DOCKER_CMD}" ]; then
     exit 1
 fi
 
-# get root access
-echo "Launching docker requires root access..."
-sudo echo ""
+# test if root access is needed
+IN_DOCKER_GROUP=`id | grep -c "docker"`
 
-if [ $? != 0 ]; then
-    echo "Error: Failed to get root access."
-    exit 1
+if [ $IN_DOCKER_GROUP == 1 ]; then
+    DOCKER_CMD="docker"
+else
+    # get root access
+    echo "Launching docker requires root access..."
+    sudo echo ""
+
+    if [ $? != 0 ]; then
+        echo "Error: Failed to get root access."
+        exit 1
+    fi
+
+    DOCKER_CMD="sudo docker"
 fi
 
 # Make sure the image is installed
-IMG_COUNT=`sudo docker image ls | grep -c "${img_name}"`
+IMG_COUNT=`sudo ${DOCKER_CMD} image ls | grep -c "${img_name}"`
 
 if [ ${IMG_COUNT} -lt 1 ]; then
     echo "Docker image '${img_name}' is not installed."
@@ -37,16 +46,13 @@ if [ ${IMG_COUNT} -lt 1 ]; then
     fi
 
     # install the image
-    sudo docker pull ${img_name}
+    ${DOCKER_CMD} pull ${img_name}
 
     if [ $? != 0 ]; then
         echo "Error: Failed to install docker image."
         exit 1
     fi
 fi
-
-echo "Test end"
-exit 0
 
 # find  first free port 
 # There is probably a better way
@@ -86,4 +92,4 @@ echo $ADRESS
 ( sleep 10 ; xdg-open $ADRESS) &
 
 # Launch the docker image
-sudo docker run -it -p $PORT:${PORT} -v $data:/data/ $img_name jupyter notebook --ip=0.0.0.0 --port=${PORT} --no-browser
+${DOCKER_CMD} run -it -p $PORT:${PORT} -v $data:/data/ -v ${data}/OUT:/home/biodocker/OUT $img_name jupyter notebook --ip=0.0.0.0 --port=${PORT} --no-browser
