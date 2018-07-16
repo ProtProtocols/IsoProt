@@ -264,7 +264,7 @@ class SearchUI:
                       sampledirs.append(os.path.join(os.path.abspath(spectradir), file))
         # keep only unique sampledirs
         sampledirs = set(sampledirs)
-        sampledirs = list(sampledirs)
+        sampledirs = sorted(list(sampledirs))
         
         #print("mgf files in base folder: " + str(mgf_files_basedir))
         #print("directories with mgf-files: " + str(sampledirs))
