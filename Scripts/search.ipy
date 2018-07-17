@@ -191,8 +191,8 @@ def run(work_dir: str,
     if not os.path.isdir(peaklist_abspath):
         raise Exception("Invalid peak list directory selected: " + peaklist_abspath + " does not exist.")
 
-    peptide_shaker_jar_path = "/home/biodocker/bin/PeptideShaker-1.16.17/PeptideShaker-1.16.17.jar"
-    searchgui_jar_path = "/home/biodocker/bin/SearchGUI-3.2.20/SearchGUI-3.2.20.jar"
+    peptide_shaker_jar_path = "/home/biodocker/bin/PeptideShaker-1.16.27/PeptideShaker-1.16.27.jar"
+    searchgui_jar_path = "/home/biodocker/bin/SearchGUI-3.3.3/SearchGUI-3.3.3.jar"
 
     # the searches should be performed in the "OUT" directory
     if not os.path.isdir(work_dir):
