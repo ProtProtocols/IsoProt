@@ -91,7 +91,7 @@ echo "using port:" $PORT
 echo $ADRESS
 
 # Launch the webbrowser with a 10 second delay
-( sleep 3 ; xdg-open $ADRESS) &
+( sleep 5 ; xdg-open $ADRESS) &
 
 # Launch the docker image
 ${DOCKER_CMD} run -it -p $PORT:${PORT} -v $data:/data/ -v ${data}/OUT:/home/biodocker/OUT $img_name jupyter notebook --ip=0.0.0.0 --port=${PORT} --no-browser
