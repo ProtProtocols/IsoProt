@@ -264,7 +264,7 @@ class SearchUI:
                       sampledirs.append(os.path.join(os.path.abspath(spectradir), file))
         # keep only unique sampledirs
         sampledirs = set(sampledirs)
-        sampledirs = list(sampledirs)
+        sampledirs = sorted(list(sampledirs))
         
         #print("mgf files in base folder: " + str(mgf_files_basedir))
         #print("directories with mgf-files: " + str(sampledirs))
@@ -431,7 +431,7 @@ class ExpDesignUI:
         widget_list = list()
         widget_list.append(widgets.Label("Treatment group names:"))
         widget_list.extend(self.group_names)
-        widget_list.append(widgets.Label("Sample names (per chanel):"))
+        #widget_list.append(widgets.Label("Sample names (per channel):"))
 
         for sample_dir in range(0,len(self.spectra_file_dirs)): 
             widget_list.append(widgets.HTML("<br/>"))
@@ -466,7 +466,7 @@ class ExpDesignUI:
 
             # replace the group names
             for i in range(0, len(self.channel_names[sample_dir])):
-                ind = int(sample_group[i].replace("Group ","")) -1 
+                ind = int(self.group_selects[sample_dir][i].value.replace("Group ","")) -1 
                 sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
                 
             sample_dir_names.extend([self.spectra_file_dirs[sample_dir]] * len(self.channel_names[sample_dir]))
