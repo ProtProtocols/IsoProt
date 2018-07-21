@@ -86,12 +86,37 @@ fi
 
 # OK, let's hope there are no race conditions as this isn't really atomic
 
-ADRESS="http://localhost:$PORT/" 
-echo "using port:" $PORT
-echo $ADRESS
+ADRESS="http://localhost:$PORT/"
+echo "Adress: $ADRESS"
 
-# Launch the webbrowser with a 10 second delay
-( sleep 5 ; xdg-open $ADRESS) &
+curl_path=`command -v curl`
+wget_path=`command -v wget`
+
+# Craete is_server_ready function (based on curl and wget availability)
+# to check if jupyter notebook is up and running
+
+if [ -n "$curl_path" ]; then
+  is_server_ready(){
+    curl --silent -I $ADRESS # -I for http header only
+  }
+elif [ -n "$wget_path" ]; then
+  is_server_ready(){
+    wget --quiet -O - $ADRESS &> /dev/null
+  }
+else
+  is_server_ready(){
+    echo -e "\033[33mPlease install 'curl', or 'wget' for better user experience\033[0m"
+    sleep 5
+  }
+fi
+
+# Launch the webbrowser when jupyter notebbok becomes acssesable
+(
+  (exit 1) # set $? to "1", while will fail
+  while [ $? != "0" ]; do is_server_ready; done  # loop until server is ready
+  xdg-open $ADRESS 
+) &
+
 
 # Launch the docker image
 ${DOCKER_CMD} run -it -p $PORT:${PORT} -v $data:/data/ -v ${data}/OUT:/home/biodocker/OUT $img_name jupyter notebook --ip=0.0.0.0 --port=${PORT} --no-browser
