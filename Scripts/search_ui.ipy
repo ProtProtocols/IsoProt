@@ -70,6 +70,10 @@ def final_button_clicked(searchUI, exp_design_file_path):
 
     # add the experimental design path
     search_ui_out["exp_design_file"] = exp_design_file_path
+    
+    # save parameters
+    searchUI.save_config("/home/biodocker/OUT/protocol_parameters.json")
+
 
     # execute the user defined function
     if search_ui_in["on_complete_function"]:
@@ -355,8 +359,13 @@ class SearchUI:
 
         json_string = json.dumps(search_config)
 
-        with open(file, "w") as writer:
-            writer.write(json_string + "\n")
+        print("Saving parameters to " + file + "Not working!!!!")
+
+
+        parameter_file = open("protocol_parameters.json", "w")
+        parameter_file.write(json_string + "\n")
+        parameter_file.close()
+        
 
 
 class ExpDesignUI:
