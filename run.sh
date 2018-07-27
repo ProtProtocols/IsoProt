@@ -56,17 +56,22 @@ if [ ${IMG_COUNT} -lt 1 ]; then
     fi
 fi
 
-# find  first free port 
+# find  first free port, starting from 8888
 # There is probably a better way
-PORT=`python -c "
-import socket, itertools
-from socket import error as socket_error
-s = socket.socket()
-for port in itertools.count(8888):
-    try: s.bind(('', port)); break
-    except Exception: continue
-print(port)
-"` 
+# PORT=`python -c "
+# import socket, itertools
+# from socket import error as socket_error
+# s = socket.socket()
+# for port in itertools.count(8888):
+#     try: s.bind(('', port)); break
+#     except Exception: continue
+# print(port)
+# "` 
+
+# find  first free port, starting from 8888
+let PORT=8888                                                                   
+while ( netstat -an | grep :${PORT} &> /dev/null ); do let PORT++; done 
+
 
 # make sure the PORT was found
 if [ -z "${PORT}" ]; then
@@ -91,11 +96,16 @@ echo "Adress: $ADRESS"
 
 curl_path=`command -v curl`
 wget_path=`command -v wget`
+http_path=`command -v http`
 
 # Craete is_server_ready function (based on curl and wget availability)
 # to check if jupyter notebook is up and running
 
-if [ -n "$curl_path" ]; then
+if [ -n "$http_path" ]; then
+  is_server_ready(){
+    http GET $ADRESS &> /dev/null 
+  }
+elif [ -n "$curl_path" ]; then
   is_server_ready(){
     curl --silent -I $ADRESS # -I for http header only
   }
@@ -105,7 +115,7 @@ elif [ -n "$wget_path" ]; then
   }
 else
   is_server_ready(){
-    echo -e "\033[33mPlease install 'curl', or 'wget' for better user experience\033[0m"
+    echo -e "\033[33mPlease install 'http', 'curl', or 'wget' for better user experience\033[0m"
     sleep 5
   }
 fi
