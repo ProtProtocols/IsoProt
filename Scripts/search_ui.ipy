@@ -89,15 +89,6 @@ class SearchUI:
         Initializes the SearchUI object and creates all user interface
         objects as member variables.
         """
-
-        # working directory
-        #self.work_dir_select = widgets.Dropdown(options={'/data/': '/data/', 'Example files (parent folder)': '/home/biodocker/'},
-        #                                        value='/home/biodocker/')
-        #self.work_dir_select.observe(
-        #    lambda change: self.updateFastaFiles(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None
-        #)
-
-
         # basic search settings
         self.precursor_tolerance = widgets.IntSlider(min=-10, max=30, step=1, value=10)
         self.fragment_tolerance = widgets.BoundedFloatText(min=0, max=200, value=0.05)
@@ -130,28 +121,29 @@ class SearchUI:
                      "Acetylation of protein N-term"],
             value=['Oxidation of M'])
 
-        self.spectra_dir = widgets.Dropdown(options={'IN': 'IN', 'data' : 'data'}, value='IN')
+        self.spectra_dir = widgets.Dropdown(options={'IN': 'IN', 'data': 'data'}, value='IN')
         
-        self.spectra_dir.observe(lambda change: self.updateSpectraDir(change["new"]) if change['type'] == 'change' and change['name'] == 'value' else None)
+        self.spectra_dir.observe(
+            lambda change: self.updateSpectraDir(change["new"]) if change['type'] == 'change' and
+                                                                   change['name'] == 'value' else None)
         
         # variable to store main folder or multiple folders with mgf files
         self.spectra_file_dirs = "IN"
-
 
         # basic stat input fields
         self.summarization_method = widgets.Dropdown(options=
                                                      {"Median of all PSMs": "median",
                                                       "Average of all PSMs": "mean",
                                                       "Median with removal of outliers": "medpolish",
-                                                      "iPQF: weighted by peptide features (removes all proteins with missing values)": "iPQF",
-                                                      "Robust summarization (linear model rlm)" : "robust"},
+                                                      "iPQF: weighted by peptide features (removes all proteins with "
+                                                      "missing values)": "iPQF",
+                                                      "Robust summarization (linear model rlm)": "robust"},
                                                      value='iPQF')
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
 
         # get number of experimental conditions
         self.number_groups = widgets.IntSlider(min=2, max=20, step=1, value=2)
-
 
         # button to show experimental design
         self.exp_des_button = widgets.Button(
@@ -170,11 +162,16 @@ class SearchUI:
         self.warnings_note = widgets.HTML("")
 
     def get_work_dir(self):
+        """
+        Returns the current working directory.
+        :return: String (absolute path)
+        """
+        # Option to choose a different output folder was removed.
         return os.path.abspath("OUT")
 
     def get_spectra_file_dirs(self):
         spectra_dirs = list()
-        for i in range(0,len(self.spectra_file_dirs)):
+        for i in range(0, len(self.spectra_file_dirs)):
             spectra_dirs.append(os.path.basename(self.spectra_file_dirs[i]))
         return list(spectra_dirs)
 
@@ -186,11 +183,11 @@ class SearchUI:
         Display the experimental design dialog. This function is called
         through the button at the end of the SearchUI dialog
         """
-
         # disable the exp_design button and the labelling method
         self.exp_des_button.disabled = True
         self.labelling.disabled = True
-        #self.work_dir_select.disabled = True
+        #
+        self.spectra_dir.disabled = True
 
         # self.tab.selected_index = 1
         self.expDesignUI = ExpDesignUI(self)
@@ -200,9 +197,8 @@ class SearchUI:
         """
         Update the drop-down list that lists all available FASTA files found in the
         current input directory.]
-        :param workdir: The current working directory used to search for FASTA files.
+        :param spectradir: The current working directory used to search for FASTA files.
         """
-        
         # get all FASTA files
         fasta_files = [file for file in os.listdir(spectradir)
                                if file.endswith(".fasta") and ('decoy' not in file)]
@@ -226,54 +222,40 @@ class SearchUI:
         self.fasta_db.options = file_list
         self.fasta_db.value = sel_value
 
-        # update the list of possible peaklist directories
-        #directories = [d for d in os.listdir(spectradir) if os.path.isdir(os.path.join(spectradir, d)) and d[0] != "."]
-
-        #dir_list = dict()
-
-        #for d in directories:
-        #    dir_list[d] = os.path.join(os.path.abspath(spectradir), d)
-
-        #self.spectra_dir.options = dir_list
-
-        #if "IN" in dir_list:
-        #    self.spectra_dir.value = dir_list["IN"]
-
     def updateSpectraDir(self, spectradir):
         """
         check the spectradir folder for subfolders and whether they contain mgf files 
         and thus define multiple MS runs
         param: spectradir folder where spectra are stored
         """
-              
         if spectradir == None:
             spectradir = 'IN'
+
         spectradir = os.path.abspath(spectradir)
         dirList = os.listdir(spectradir)
         sampledirs = []
         mgf_files_basedir = 0
-        
-        
+
         # updating fasta files
         self.updateFastaFiles(spectradir)
     
         for file in dirList:
             if os.path.isfile(os.path.join(os.path.abspath(spectradir), file)):
-                #print(file)
                 if file.endswith(".mgf"):
                   mgf_files_basedir += 1
             if os.path.isdir(os.path.join(os.path.abspath(spectradir), file)):
                 for file2 in os.listdir(spectradir + "/" + file):
                     if file2.endswith(".mgf"):
                       sampledirs.append(os.path.join(os.path.abspath(spectradir), file))
+
         # keep only unique sampledirs
         sampledirs = set(sampledirs)
         sampledirs = sorted(list(sampledirs))
         
-        #print("mgf files in base folder: " + str(mgf_files_basedir))
-        #print("directories with mgf-files: " + str(sampledirs))
         if mgf_files_basedir > 0 and len(sampledirs) > 0:
-            self.warning_note = widgets.HTML('<font color="red">Place mgf-files either in the main folder or in separate subfolders when having the sample distributed over multiple iTRAQ/TMT runs!</font>')
+            self.warning_note = widgets.HTML('<font color="red">Place mgf-files either in the main folder or in '
+                                             'separate subfolders when having the sample distributed over multiple '
+                                             'iTRAQ/TMT runs!</font>')
             self.exp_des_button.disabled=True
         elif mgf_files_basedir == 0 and len(sampledirs) == 0:
             self.warning_note = widgets.HTML('<font color="red">No mgf-files found!</font>')            
@@ -286,17 +268,15 @@ class SearchUI:
             else:
                 self.spectra_file_dirs = list()
                 self.spectra_file_dirs.append(spectradir)
-           
 
     def display(self):
         """
         Displays the search user interface.
         """
-        #self.updateFastaFiles(self.work_dir_select.value)
         self.updateSpectraDir(self.spectra_dir.value)
 
         search_box = VBox([widgets.HTML(
-    value="<h4>Folders and files</h4>"),
+                           value="<h4>Folders and files</h4>"),
                            Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
                            self.generate_decoy,
                            #Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
@@ -390,7 +370,7 @@ class ExpDesignUI:
         self.group_ids = list()
         self.group_names.append(widgets.Text(placeholder="Control", description="Group 1:"))
         self.group_ids.append("Group 1")
-        for group in range(1,searchUI.number_groups.value ):
+        for group in range(1, searchUI.number_groups.value):
             self.group_names.append(widgets.Text(placeholder="Treatment " + str(group), description="Group " + str(group+1) + ":"))
             self.group_ids.append("Group " + str(group+1))
 
