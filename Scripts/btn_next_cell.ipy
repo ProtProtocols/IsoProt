@@ -4,6 +4,8 @@ This module simply displays a button to execute the N next cells
 Input (btn_next_cell_in):
   :key description: The text to appear on the button (default: "Run next cells")
   :key n_cells_to_run: The number of next cells to execute (default: 1)
+  :key before_function: If set, this function is called before executing the cells.
+
 Output (btn_next_cell_out):
   :key button: The button object.
 
@@ -23,16 +25,37 @@ from IPython.display import Javascript, display
 global btn_next_cell_in, btn_next_cell_out
 
 
+def btn_next_cell_click(btn_n_cells: int, before_function = None):
+    """
+    Function executed when the button is clicked
+    :param btn_n_cells: Number of cells to execute
+    :param before_function: Function to call before executing the cells
+    """
+    # launch the function if set
+    if before_function:
+        before_function()
+
+    display(
+        # Run the javascript code to launch the next cell
+        Javascript(
+            'IPython.notebook.execute_cell_range(IPython.notebook.get_selected_index()+1, '
+            'IPython.notebook.get_selected_index()+' + str(btn_n_cells) + ')')
+    )
+
+
 def main():
     global btn_next_cell_in, btn_next_cell_out
 
     btn_desc = "Run next cells"
     btn_n_cells = 1
+    before_function = None
 
     if "btn_next_cell_in" in globals() and "description" in btn_next_cell_in:
         btn_desc = btn_next_cell_in["description"]
     if "btn_next_cell_in" in globals() and "n_cells_to_run" in btn_next_cell_in:
         btn_n_cells = btn_next_cell_in["n_cells_to_run"]
+    if "btn_next_cell_in" in globals() and "before_function" in btn_next_cell_in:
+        before_function = btn_next_cell_in["before_function"]
 
     # increase the number of cells to run +1 as it's used as an index
     btn_n_cells += 1
@@ -42,11 +65,7 @@ def main():
         description=btn_desc,
         layout=widgets.Layout(width='30%'))
 
-    btn_next_cell.on_click(lambda _: display(
-        # Run the javascript code to launch the next cell
-        Javascript(
-            'IPython.notebook.execute_cell_range(IPython.notebook.get_selected_index()+1, IPython.notebook.get_selected_index()+' + str(btn_n_cells) + ')')
-    ))
+    btn_next_cell.on_click(lambda _: btn_next_cell_click(btn_n_cells, before_function))
 
     btn_next_cell_out = {"button": btn_next_cell}
 
