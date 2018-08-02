@@ -26,6 +26,7 @@ Output (search_ui_out):
     :key target_fdr: Target FDR to use (all levels).
     :key spec_file_dir: Path to the spectrum directories (or base directory when one MS sample type).
     :key num_groups: Number of experimental conditions.
+    :key search_ui: The SearchUI object.
 """
 
 import ipywidgets as widgets
@@ -70,6 +71,9 @@ def final_button_clicked(searchUI, exp_design_file_path):
 
     # add the experimental design path
     search_ui_out["exp_design_file"] = exp_design_file_path
+
+    # add the searchUI object
+    search_ui_out["search_ui"] = searchUI
     
     # save parameters
     searchUI.save_config("/home/biodocker/OUT/protocol_parameters.json")
