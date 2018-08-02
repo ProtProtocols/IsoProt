@@ -74,7 +74,6 @@ def final_button_clicked(searchUI, exp_design_file_path):
     # save parameters
     searchUI.save_config("/home/biodocker/OUT/protocol_parameters.json")
 
-
     # execute the user defined function
     if search_ui_in["on_complete_function"]:
         search_ui_in["on_complete_function"]()
@@ -89,12 +88,32 @@ class SearchUI:
         Initializes the SearchUI object and creates all user interface
         objects as member variables.
         """
-        # basic search settings
+        # folders
+        self.spectra_dir = widgets.Dropdown(options={'IN': 'IN', 'data': 'data'}, value='IN')
+        self.spectra_dir.observe(
+            lambda change: self.updateSpectraDir(change["new"]) if change['type'] == 'change' and
+                                                                   change['name'] == 'value' else None)
+        # variable to store main folder or multiple folders with mgf files
+        self.spectra_file_dirs = "IN"
+
+        self.fasta_db = widgets.Dropdown(options={"sp_human.fasta": "IN/sp_human.fasta"})
+        self.generate_decoy = widgets.Checkbox(value=True, description="Generate decoy sequences")
+
+        # search settings
         self.precursor_tolerance = widgets.IntSlider(min=-10, max=30, step=1, value=10)
         self.fragment_tolerance = widgets.BoundedFloatText(min=0, max=200, value=0.05)
-        self.fasta_db = widgets.Dropdown(options={"sp_human.fasta": "IN/sp_human.fasta"})
+        self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
+        self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
+        self.var_ptms = widgets.SelectMultiple(
+            options=["Oxidation of M",
+                     "Phosphorylation of STY",
+                     "Deamidation of N",
+                     "Deamidation of Q",
+                     "Acetylation of K",
+                     "Acetylation of peptide N-term",
+                     "Acetylation of protein N-term"],
+            value=['Oxidation of M'])
 
-        self.generate_decoy = widgets.Checkbox(value=True, description="Generate decoy sequences")
         self.target_fdr = widgets.BoundedFloatText(min=0, max=1, value=0.01)
 
         # TODO  needs table to describe labeling formats
@@ -107,30 +126,7 @@ class SearchUI:
                                            'iTRAQ8 (Y variable)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of peptide N-term'},
                                           value='iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term')
 
-        self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
-        self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
-
-        # PTMs
-        self.var_ptms = widgets.SelectMultiple(
-            options=["Oxidation of M",
-                     "Phosphorylation of STY",
-                     "Deamidation of N",
-                     "Deamidation of Q",
-                     "Acetylation of K",
-                     "Acetylation of peptide N-term",
-                     "Acetylation of protein N-term"],
-            value=['Oxidation of M'])
-
-        self.spectra_dir = widgets.Dropdown(options={'IN': 'IN', 'data': 'data'}, value='IN')
-        
-        self.spectra_dir.observe(
-            lambda change: self.updateSpectraDir(change["new"]) if change['type'] == 'change' and
-                                                                   change['name'] == 'value' else None)
-        
-        # variable to store main folder or multiple folders with mgf files
-        self.spectra_file_dirs = "IN"
-
-        # basic stat input fields
+        # quantification settings
         self.summarization_method = widgets.Dropdown(options=
                                                      {"Median of all PSMs": "median",
                                                       "Average of all PSMs": "mean",
@@ -147,17 +143,38 @@ class SearchUI:
 
         # button to show experimental design
         self.exp_des_button = widgets.Button(
-            description='Enter design',
+            description='Generate design',
             disabled=False,
             button_style='',  # 'success', 'info', 'warning', 'danger' or ''
-            tooltip='Enter experimental design',
+            tooltip='Generate the experimental design',
             icon='check'
         )
 
         self.exp_des_button.on_click(lambda _: self.show_exp_design())
         # create the expDesignUI object once the search UI is being displayed
         self.expDesignUI = None
-        
+
+        # button to reset the experimental design settings
+        self.reset_exp_des_btn = widgets.Button(
+            description='Reset design',
+            disabled=True,
+            button_style='danger',
+            tooltip='Reset and delete the experimental design'
+        )
+        self.reset_exp_des_btn.on_click(lambda _: self.reset_exp_design())
+
+        # button to launch the search - only enabled if the exp design is entered and saved
+        self.search_button = widgets.Button(
+            description=search_ui_in["on_complete_description"],
+            disabled=True,
+            button_style='success',  # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='This can only be launched when the experimental design is saved.'
+        )
+
+        self.search_button.on_click(
+            lambda _: final_button_clicked(self, self.expDesignUI.result_file_path)
+        )
+
         # Placeholder for warnings
         self.warnings_note = widgets.HTML("")
 
@@ -186,12 +203,43 @@ class SearchUI:
         # disable the exp_design button and the labelling method
         self.exp_des_button.disabled = True
         self.labelling.disabled = True
-        #
         self.spectra_dir.disabled = True
+        self.reset_exp_des_btn.disabled = False
 
         # self.tab.selected_index = 1
         self.expDesignUI = ExpDesignUI(self)
-        display(self.expDesignUI.get_root_widget())
+        exp_design_widget = self.expDesignUI.get_root_widget()
+        self.vbox_exp_design.children = [exp_design_widget]
+
+        # change the selected tab
+        self.tabs.selected_index = 1
+
+    def reset_exp_design(self):
+        """
+        This function removes the shown experimental design
+        and enables all associated buttons again.
+        """
+        self.exp_des_button.disabled = False
+        self.labelling.disabled = False
+        self.spectra_dir.disabled = False
+        self.reset_exp_des_btn.disabled = True
+        self.set_enable_search_btn(False)
+
+        # delete the expDesignUI object and exp_design file just in case
+        if os.path.isfile(self.expDesignUI.result_file_path):
+            os.remove(self.expDesignUI.result_file_path)
+
+        self.expDesignUI = None
+
+        # add the placeholder again
+        self.vbox_exp_design.children = [widgets.HTML("<h5>Please click 'Generate Design' first</h5>")]
+
+    def set_enable_search_btn(self, is_enabled: bool):
+        """
+        Enable or disable the search button
+        :param is_enabled: Indicates whether the button is enabled or disabled
+        """
+        self.search_button.disabled = not is_enabled
 
     def updateFastaFiles(self, spectradir):
         """
@@ -275,31 +323,45 @@ class SearchUI:
         """
         self.updateSpectraDir(self.spectra_dir.value)
 
-        search_box = VBox([widgets.HTML(
-                           value="<h4>Folders and files</h4>"),
-                           Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
-                           self.generate_decoy,
-                           #Label('Working directory (existing files will be deleted!)'), self.work_dir_select,
-                           widgets.HTML('Folder for spectra files (files need to be mgf) and fasta database<br/>(remove <i>iTRAQCancer.mgf</i> when using <i>IN</i>)'), self.spectra_dir,
-                           widgets.HTML(value="<h4>Database search</h4>"),
-                           Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
-                           Label('Fragment ion tolerance (da):'), self.fragment_tolerance,
-                           Label('Number of miscleavages;'), self.missed_cleavages,
-                           Label('Further fixed modifications'), self.fixed_ptms,
-                           Label('Further variable modifications (Hold Ctrl to select multiple)'), self.var_ptms,
-                           Label('Target (protein, peptide, and PSM) FDR:'), self.target_fdr,
-                           Label('Quantification method:'), self.labelling,
-                               widgets.HTML(value="<h4>Quantification</h4>"),
-                           Label('Summarization method:'), self.summarization_method,
-                           Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
-                           self.use_ptms_for_quant,
-                           Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
-                           Label('Note: When entering the experimental design, the labelling method can no longer be changed.'),
-                           self.warning_note,
-                           self.exp_des_button])
+        self.vbox_search = VBox([
+            widgets.HTML("<h4>Folders and files</h4>"),
+            widgets.HTML('Folder for spectra files (files need to be mgf) and fasta database<br/>'
+                         '(remove <i>iTRAQCancer.mgf</i> when using <i>IN</i>)'),
+            self.spectra_dir,
+            widgets.HTML(value="<h4>Database search</h4>"),
+            Label('Fasta file (database, must NOT contain decoy sequences):'), self.fasta_db,
+            self.generate_decoy,
+            Label('Precursor tolerance (ppm):'), self.precursor_tolerance,
+            Label('Fragment ion tolerance (da):'), self.fragment_tolerance,
+            Label('Number of miscleavages;'), self.missed_cleavages,
+            Label('Further fixed modifications'), self.fixed_ptms,
+            Label('Further variable modifications (Hold Ctrl to select multiple)'), self.var_ptms,
+            Label('Target (protein, peptide, and PSM) FDR:'), self.target_fdr,
+            Label('Quantification method:'), self.labelling,
+            Label('Note: When entering the experimental design, the labelling method can no longer be changed unless '
+                  'the experimental design is reset.'),
+            widgets.HBox([self.exp_des_button, self.reset_exp_des_btn])])
 
-        ui = search_box
-        display(ui)
+        # vbox_exp_design is used as a placeholder for the experimental design
+        self.vbox_exp_design = VBox([widgets.HTML("<h5>Please click 'Generate Design' first</h5>")])
+
+        self.vbox_quant_params = VBox([
+            Label('Summarization method:'), self.summarization_method,
+            Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
+            self.use_ptms_for_quant,
+            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
+            self.search_button
+            ])
+
+        self.tabs = widgets.Tab()
+        self.tabs.children = [self.vbox_search, self.vbox_exp_design, self.vbox_quant_params]
+        self.tabs.set_title(0, "Folders and search")
+        self.tabs.set_title(1, "Experimental design")
+        self.tabs.set_title(2, "Quantitative analysis")
+
+        container_box = VBox([self.tabs, self.warning_note])
+
+        display(container_box)
 
     def _ipython_display_(self):
         return self.display()
@@ -341,11 +403,9 @@ class SearchUI:
 
         print("Saving parameters to " + file + "Not working!!!!")
 
-
         parameter_file = open("protocol_parameters.json", "w")
         parameter_file.write(json_string + "\n")
         parameter_file.close()
-        
 
 
 class ExpDesignUI:
@@ -362,7 +422,7 @@ class ExpDesignUI:
         
         # in the case of multiple iTRAQ/TMT runs, get subfolders, otherwise this is main spectra folder
         self.spectra_file_dirs = searchUI.get_spectra_file_dirs()
-        if (len(self.spectra_file_dirs) == 0):
+        if len(self.spectra_file_dirs) == 0:
             raise Exception("No spectra directory")
 
         # Different experimental conditions
@@ -416,11 +476,11 @@ class ExpDesignUI:
     def get_root_widget(self):
         """
         Displays the user interface to enter the experimental design.
+        :return: Returns a widget containing the experimental user interface.
         """
         widget_list = list()
         widget_list.append(widgets.Label("Treatment group names:"))
         widget_list.extend(self.group_names)
-        #widget_list.append(widgets.Label("Sample names (per channel):"))
 
         for sample_dir in range(0,len(self.spectra_file_dirs)): 
             widget_list.append(widgets.HTML("<br/>"))
@@ -468,22 +528,7 @@ class ExpDesignUI:
         design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)
 
         # add the run search button
-        if not self.search_button_visible:
-            self.search_button = widgets.Button(
-                description=search_ui_in["on_complete_description"],
-                disabled=False,
-                button_style='',  # 'success', 'info', 'warning', 'danger' or ''
-                icon='check'
-            )
-
-            self.search_button.on_click(
-                lambda _: final_button_clicked(self.searchUI, self.result_file_path)
-            )
-
-            search_box = VBox([self.search_button])
-            display(search_box)
-
-            self.search_button_visible = True
+        self.searchUI.set_enable_search_btn(True)
 
 
 # global stuff
