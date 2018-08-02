@@ -202,7 +202,7 @@ def run(work_dir: str,
         tmp_files = [f for f in os.listdir(work_dir) if os.path.isfile(os.path.join(work_dir, f))]
         for tmp_file in tmp_files:
             # don't delete the experimental design
-            if "exp_design.tsv" in tmp_file:
+            if "exp_design.tsv" in tmp_file or "protocol_parameters.json" in tmp_file:
                 continue
 
             complete_name = os.path.join(work_dir, tmp_file)

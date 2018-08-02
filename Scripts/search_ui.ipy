@@ -405,11 +405,10 @@ class SearchUI:
 
         json_string = json.dumps(search_config)
 
-        print("Saving parameters to " + file + "Not working!!!!")
+        print("Saving parameters to " + file)
 
-        parameter_file = open("protocol_parameters.json", "w")
-        parameter_file.write(json_string + "\n")
-        parameter_file.close()
+        with open(file, "w") as writer:
+            writer.write(json_string)
 
 
 class ExpDesignUI:
@@ -492,6 +491,8 @@ class ExpDesignUI:
             for i in range(0, len(self.channel_names[sample_dir])):
                 widget_list.append(widgets.HBox([self.channel_names[sample_dir][i], self.group_selects[sample_dir][i]]))
 
+        widget_list.append(widgets.HTML("<b>Note:</b> Changes to the experimental design only take effect when "
+                                        "clicking the 'Save design' button."))
         widget_list.append(self.save_button)
 
         widget_box = VBox(widget_list)
