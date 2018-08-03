@@ -56,6 +56,21 @@ def main():
     searchUI = SearchUI()
     searchUI.display()
 
+    # test whether a configuration already exists in the default location
+    if os.path.isdir("OUT") and os.path.isfile("OUT/protocol_parameters.json"):
+        searchUI.load_config("OUT/protocol_parameters.json")
+
+        # automatically generate a result object
+        if os.path.isfile("OUT/exp_design.tsv"):
+            global search_ui_out
+
+            # create the output object
+            search_ui_out = searchUI.get_settings_as_dict()
+            # add the experimental design path
+            search_ui_out["exp_design_file"] = "OUT/exp_design.tsv"
+            # add the searchUI object
+            search_ui_out["search_ui"] = searchUI
+
 
 def final_button_clicked(searchUI, exp_design_file_path):
     """
@@ -180,7 +195,8 @@ class SearchUI:
         )
 
         # Placeholder for warnings
-        self.warnings_note = widgets.HTML("")
+        self.warning_note = widgets.HTML("")
+        self.set_warning_message("") # this initializes the object with the correct html
 
     def get_work_dir(self):
         """
@@ -199,15 +215,17 @@ class SearchUI:
     def get_labelling_method(self):
         return list(self.labelling.options.keys())[self.labelling.index]
 
-    def show_exp_design(self):
+    def show_exp_design(self, change_tab: bool = True):
         """
         Display the experimental design dialog. This function is called
         through the button at the end of the SearchUI dialog
+        :param change_tab: Indicates whether the tab shoule be changed
         """
         # disable the exp_design button and the labelling method
         self.exp_des_button.disabled = True
         self.labelling.disabled = True
         self.spectra_dir.disabled = True
+        self.number_groups.disabled = True
         self.reset_exp_des_btn.disabled = False
 
         # self.tab.selected_index = 1
@@ -216,7 +234,8 @@ class SearchUI:
         self.vbox_exp_design.children = [exp_design_widget]
 
         # change the selected tab
-        self.tabs.selected_index = 1
+        if change_tab:
+            self.tabs.selected_index = 1
 
     def reset_exp_design(self):
         """
@@ -226,6 +245,7 @@ class SearchUI:
         self.exp_des_button.disabled = False
         self.labelling.disabled = False
         self.spectra_dir.disabled = False
+        self.number_groups.disabled = False
         self.reset_exp_des_btn.disabled = True
         self.set_enable_search_btn(False)
 
@@ -252,13 +272,12 @@ class SearchUI:
         :param spectradir: The current working directory used to search for FASTA files.
         """
         # get all FASTA files
-        fasta_files = [file for file in os.listdir(spectradir)
-                               if file.endswith(".fasta") and ('decoy' not in file)]
+        fasta_files = [file for file in os.listdir(spectradir) if file.endswith(".fasta") and ('decoy' not in file)]
 
         # also search all subdirectories for FASTA files
         for d in os.listdir(spectradir):
             d_path = os.path.join(spectradir, d)
-            if os.path.isdir(d_path) and d[0] != ".":
+            if os.path.isdir(d_path) and d[0] != "." and os.access(d_path, os.R_OK):
                 fasta_files += [os.path.join(d, file) for file in os.listdir(d_path)
                                                         if file.endswith(".fasta") and ('decoy' not in file)]
 
@@ -292,29 +311,32 @@ class SearchUI:
         self.updateFastaFiles(spectradir)
     
         for file in dirList:
-            if os.path.isfile(os.path.join(os.path.abspath(spectradir), file)):
-                if file.endswith(".mgf"):
-                  mgf_files_basedir += 1
-            if os.path.isdir(os.path.join(os.path.abspath(spectradir), file)):
-                for file2 in os.listdir(spectradir + "/" + file):
-                    if file2.endswith(".mgf"):
-                      sampledirs.append(os.path.join(os.path.abspath(spectradir), file))
+            file_path = os.path.join(os.path.abspath(spectradir), file)
+
+            # if it's a file, test whether it's an MGF file
+            if os.path.isfile(file_path) and file.lower().endswith(".mgf"):
+                mgf_files_basedir += 1
+            # if it's a directory, check whether it contains MGF files
+            elif os.path.isdir(file_path) and os.access(file_path, os.R_OK):
+                for file2 in os.listdir(file_path):
+                    if file2.lower().endswith(".mgf"):
+                      sampledirs.append(file_path)
 
         # keep only unique sampledirs
         sampledirs = set(sampledirs)
         sampledirs = sorted(list(sampledirs))
         
         if mgf_files_basedir > 0 and len(sampledirs) > 0:
-            self.warning_note = widgets.HTML('<font color="red">Place mgf-files either in the main folder or in '
-                                             'separate subfolders when having the sample distributed over multiple '
-                                             'iTRAQ/TMT runs!</font>')
+            self.set_warning_message('Place mgf-files either in the main folder or in '
+                                     'separate subfolders when having the sample distributed over multiple '
+                                     'iTRAQ/TMT runs!', style="error")
             self.exp_des_button.disabled=True
         elif mgf_files_basedir == 0 and len(sampledirs) == 0:
-            self.warning_note = widgets.HTML('<font color="red">No mgf-files found!</font>')            
+            self.set_warning_message("No MGF files found!", style="error")
             self.exp_des_button.disabled=True
         else:
             self.exp_des_button.disabled=False
-            self.warning_note = widgets.HTML("")
+            self.set_warning_message("")
             if len(sampledirs) > 0:
                 self.spectra_file_dirs = sampledirs
             else:
@@ -342,8 +364,9 @@ class SearchUI:
             Label('Further variable modifications (Hold Ctrl to select multiple)'), self.var_ptms,
             Label('Target (protein, peptide, and PSM) FDR:'), self.target_fdr,
             Label('Quantification method:'), self.labelling,
-            Label('Note: When entering the experimental design, the labelling method can no longer be changed unless '
-                  'the experimental design is reset.'),
+            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
+            Label('Note: When entering the experimental design, the labelling method and number of groups can no '
+                  'longer be changed unless the experimental design is reset.'),
             widgets.HBox([self.exp_des_button, self.reset_exp_des_btn])])
 
         # vbox_exp_design is used as a placeholder for the experimental design
@@ -353,7 +376,6 @@ class SearchUI:
             Label('Summarization method:'), self.summarization_method,
             Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
             self.use_ptms_for_quant,
-            Label('Number of different experimental conditions (e.g. control and treatment)'), self.number_groups,
             self.search_button
             ])
 
@@ -363,12 +385,83 @@ class SearchUI:
         self.tabs.set_title(1, "Experimental design")
         self.tabs.set_title(2, "Quantitative analysis")
 
-        container_box = VBox([self.tabs, self.warning_note])
+        self.container_box = VBox([self.tabs, self.warning_note])
 
-        display(container_box)
+        display(self.container_box)
+
+    def set_warning_message(self, message: str, style: str="default"):
+        """
+        Set the currently displayed warning message. To clear the message, simply pass ""
+        :param message: The (HTML formatted) message to display
+        :param style: Can be "default", "warning", or "error"
+        """
+        error_style = ""
+        prefix = "Status: "
+
+        if style == "error":
+            error_style="color: 'red'"
+            prefix = "Error: "
+        elif style == "warning":
+            error_style="color: 'organge'"
+            prefix = "Warning: "
+
+        self.warning_note.value = "<div style='border: 1px solid #999999; padding: 5px;" + error_style + "'>" + \
+                                  "<b>" + prefix + "</b>" + \
+                                  message + \
+                                  "</div>"
 
     def _ipython_display_(self):
         return self.display()
+
+    def set_settings_from_dict(self, settings: dict):
+        """
+        Sets the settings of all UI components based on a JSON
+        fromatted settings string.
+        :param settings: A dict representing the settings.
+        """
+        # workdir is currently not used
+
+        # derive the input directory from the spectra directories
+        if "/home/biodocker/IN" in settings["input_directory"][0]:
+            self.spectra_dir.value = "IN"
+        elif "/home/biodocker/data" in settings["input_directory"][0]:
+            self.spectra_dir.value = "data"
+
+        # update the drop-down for available FASTA DBs and spectra directories
+        self.updateFastaFiles(self.spectra_dir.value)
+        self.updateSpectraDir(self.spectra_dir.value)
+
+        # make sure that the structure did not change
+        if self.spectra_file_dirs != settings["input_directory"]:
+            raise Exception("Directory structure changed")
+
+        self.precursor_tolerance.value = settings["precursor_tolerance"]
+        self.fragment_tolerance.value = settings["fragment_tolerance"]
+        self.fasta_db.value = settings["fasta_db"]
+        self.generate_decoy.value = settings["generate_decoy"]
+        self.labelling.value = settings["labelling"]
+        self.missed_cleavages.value = settings["missed_cleavages"]
+        self.fixed_ptms.value = settings["fixed_ptms"]
+        self.var_ptms.value = settings["var_ptms"]
+        self.summarization_method.value = settings["summarization_method"]
+        self.min_protein_psms.value = settings["min_protein_psms"]
+        self.use_ptms_for_quant.value = settings["use_ptms_for_quant"]
+        self.target_fdr.value = settings["target_fdr"]
+        self.number_groups.value = settings["number_groups"]
+
+        # regenerate the experimental design
+        self.show_exp_design(change_tab=False)
+
+        try:
+            design_loaded = self.expDesignUI.load_design()
+        except Exception as e:
+            self.set_warning_message(str(e) + ". Experimental design not loaded.", style="warning")
+            # reset any already added settings
+            self.show_exp_design(change_tab=False)
+            design_loaded=False
+
+        if design_loaded:
+            self.set_enable_search_btn(True)
 
     def get_settings_as_dict(self):
         """
@@ -394,6 +487,17 @@ class SearchUI:
         search_config["number_groups"] = self.number_groups.value
 
         return search_config
+
+    def load_config(self, file: str):
+        """
+        Load the configuration from a JSON formatted text file.
+        :param file: Path to the file
+        """
+        with open(file, "r") as reader:
+            settings = json.load(reader)
+
+            self.set_warning_message("Settings loaded from " + file)
+            self.set_settings_from_dict(settings)
 
     def save_config(self, file):
         """
@@ -532,8 +636,67 @@ class ExpDesignUI:
 
         design_data.to_csv(path_or_buf=self.result_file_path, sep="\t", index=False)
 
-        # add the run search button
+        # enable the run search button
         self.searchUI.set_enable_search_btn(True)
+
+        # move to the next tab
+        self.searchUI.tabs.selected_index += 1
+
+    def load_design(self) -> bool:
+        """
+        Load the experimental design settings from the defined
+        result_file_path.
+        :return: Boolean indicating whether the design was loaded
+        """
+        if not os.path.isfile(self.result_file_path):
+            return False
+
+        # load the design
+        design = pd.read_csv(self.result_file_path, sep="\t")
+
+        # get sample group names
+        group_names = dict()
+
+        for i in range(len(design)):
+            group_names[design["sample_group"][i]] = design["sample_orig"][i]
+
+        for i in range(len(self.group_names)):
+            group_id = "Group " + str(i + 1)
+            if group_id in group_names:
+                self.group_names[i].value = group_names[group_id]
+
+        # get the folders and make sure they exist
+        spec_dirs = set([s for s in design["spec_dir"]])
+
+        if len(spec_dirs) != len(self.spectra_file_dirs):
+            raise Exception("Different numbers of spectra directories found.")
+
+        for spec_dir in spec_dirs:
+            if spec_dir not in self.spectra_file_dirs:
+                raise Exception(spec_dir + " missing in GUI")
+
+        # create a dict to set the sample ids
+        samples_per_dir = dict()
+
+        for i in range(len(design)):
+            sample_dir = design["spec_dir"][i]
+            if sample_dir not in samples_per_dir:
+                samples_per_dir[sample_dir] = list()
+
+            samples_per_dir[sample_dir].append({
+                "group": design["sample_group"][i],
+                "name": design["sample_name"][i]
+            })
+
+        # set the sample options
+        for sample_dir_index in range(len(self.spectra_file_dirs)):
+            sample_dir = self.spectra_file_dirs[sample_dir_index]
+
+            for channel_index in range(len(samples_per_dir[sample_dir])):
+                self.channel_names[sample_dir_index][channel_index].value = samples_per_dir[sample_dir][channel_index]["name"]
+                self.group_selects[sample_dir_index][channel_index].value = samples_per_dir[sample_dir][channel_index]["group"]
+
+        return True
 
 
 # global stuff
