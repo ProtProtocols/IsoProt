@@ -194,10 +194,6 @@ class SearchUI:
             lambda _: final_button_clicked(self, self.expDesignUI.result_file_path)
         )
 
-        # Placeholder for warnings
-        self.warning_note = widgets.HTML("")
-        self.set_warning_message("") # this initializes the object with the correct html
-
     def change_tab(self, tab_index: int):
         """
         Change to the defined tab
@@ -344,16 +340,15 @@ class SearchUI:
         sampledirs = sorted(list(sampledirs))
         
         if mgf_files_basedir > 0 and len(sampledirs) > 0:
-            self.set_warning_message('Place mgf-files either in the main folder or in '
+            self.show_dialog('Place mgf-files either in the main folder or in '
                                      'separate subfolders when having the sample distributed over multiple '
                                      'iTRAQ/TMT runs!', style="error")
             self.exp_des_button.disabled=True
         elif mgf_files_basedir == 0 and len(sampledirs) == 0:
-            self.set_warning_message("No MGF files found!", style="error")
+            self.show_dialog("No MGF files found!", style="error")
             self.exp_des_button.disabled=True
         else:
             self.exp_des_button.disabled=False
-            self.set_warning_message("")
             if len(sampledirs) > 0:
                 self.spectra_file_dirs = sampledirs
             else:
@@ -402,30 +397,24 @@ class SearchUI:
         self.tabs.set_title(1, "Experimental design")
         self.tabs.set_title(2, "Quantitative analysis")
 
-        self.container_box = VBox([self.tabs, self.warning_note])
+        display(self.tabs)
 
-        display(self.container_box)
-
-    def set_warning_message(self, message: str, style: str="default"):
+    def show_dialog(self, message: str, style: str= "default"):
         """
-        Set the currently displayed warning message. To clear the message, simply pass ""
+        Displays a model dialog to the user
         :param message: The (HTML formatted) message to display
         :param style: Can be "default", "warning", or "error"
         """
-        error_style = ""
-        prefix = "Status: "
+        title = "Status"
 
         if style == "error":
-            error_style="color: 'red'"
-            prefix = "Error: "
+            title = "Error"
         elif style == "warning":
-            error_style="color: 'organge'"
-            prefix = "Warning: "
+            title = "Warning"
 
-        self.warning_note.value = "<div style='border: 1px solid #999999; padding: 5px;" + error_style + "'>" + \
-                                  "<b>" + prefix + "</b>" + \
-                                  message + \
-                                  "</div>"
+        display(Javascript(
+            'requirejs("base/js/dialog").modal({title: "' + title + '", body: "' + message + '", buttons: {OK: {}}})')
+        )
 
     def _ipython_display_(self):
         return self.display()
@@ -471,8 +460,9 @@ class SearchUI:
 
         try:
             design_loaded = self.expDesignUI.load_design()
+            self.show_dialog("Previous settings successfully loaded")
         except Exception as e:
-            self.set_warning_message(str(e) + ". Experimental design not loaded.", style="warning")
+            self.show_dialog(str(e) + ". Experimental design not loaded.", style="warning")
             # reset any already added settings
             self.show_exp_design(change_tab=False)
             design_loaded=False
@@ -512,8 +502,6 @@ class SearchUI:
         """
         with open(file, "r") as reader:
             settings = json.load(reader)
-
-            self.set_warning_message("Settings loaded from " + file)
             self.set_settings_from_dict(settings)
 
     def save_config(self, file):
