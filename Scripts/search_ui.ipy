@@ -198,6 +198,23 @@ class SearchUI:
         self.warning_note = widgets.HTML("")
         self.set_warning_message("") # this initializes the object with the correct html
 
+    def change_tab(self, tab_index: int):
+        """
+        Change to the defined tab
+        :param tab_index: Index of the tab to change to
+        """
+        if self.tabs:
+            self.tabs.selected_index = tab_index
+
+            # scroll to the top of the current cell
+            display(Javascript('Jupyter.notebook.scroll_to_cell(Jupyter.notebook.get_selected_index())'))
+
+    def move_to_next_tab(self):
+        """
+        Select the next tab
+        """
+        self.change_tab(self.tabs.selected_index + 1)
+
     def get_work_dir(self):
         """
         Returns the current working directory.
@@ -235,7 +252,7 @@ class SearchUI:
 
         # change the selected tab
         if change_tab:
-            self.tabs.selected_index = 1
+            self.change_tab(1)
 
     def reset_exp_design(self):
         """
@@ -640,7 +657,7 @@ class ExpDesignUI:
         self.searchUI.set_enable_search_btn(True)
 
         # move to the next tab
-        self.searchUI.tabs.selected_index += 1
+        self.searchUI.move_to_next_tab()
 
     def load_design(self) -> bool:
         """
