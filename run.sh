@@ -57,21 +57,8 @@ if [ ${IMG_COUNT} -lt 1 ]; then
 fi
 
 # find  first free port, starting from 8888
-# There is probably a better way
-# PORT=`python -c "
-# import socket, itertools
-# from socket import error as socket_error
-# s = socket.socket()
-# for port in itertools.count(8888):
-#     try: s.bind(('', port)); break
-#     except Exception: continue
-# print(port)
-# "` 
-
-# find  first free port, starting from 8888
 let PORT=8888                                                                   
 while ( netstat -an | grep :${PORT} &> /dev/null ); do let PORT++; done 
-
 
 # make sure the PORT was found
 if [ -z "${PORT}" ]; then
@@ -87,6 +74,12 @@ if [ ! -d "OUT" ]; then
         echo "Error: Failed to create result directory ('OUT')."
         exit 1
     fi
+fi
+
+# make sure the directory is writeable
+if [ ! -w "OUT" ]; then
+    echo "Error: Missing premissions to write into 'OUT' directory."
+    exit 1
 fi
 
 # OK, let's hope there are no race conditions as this isn't really atomic
