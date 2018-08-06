@@ -142,11 +142,12 @@ class TaskRunner:
         task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
 
         if task.returncode != 0:
-            print(task.stdout)
+            print(task.stdout.decode())
             raise Exception("Error: %s failed" % name)
 
         if check_for_file:
             if not os.path.isfile(check_for_file):
+                print(task.stdout.decode())
                 raise Exception("Error: Result file '%s' not found." % check_for_file)
 
         run_time = time.time() - start_time
@@ -227,14 +228,15 @@ def run(work_dir: str,
         print("Creating decoy database...")
 
         # create the decoy database
-        subprocess.run(["java", "-Xmx" + str(free_mem) + "M",
-                        "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.FastaCLI",
-                        "-in", fasta_db_path,
-                        "-decoy"],
-                       check=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        decoy_args = ["java", "-Xmx" + str(free_mem) + "M",
+                      "-cp", searchgui_jar_path, "eu.isas.searchgui.cmd.FastaCLI",
+                      "-in", fasta_db_path,
+                      "-decoy"]
 
         # get the filename of the decoy database
         database_file = os.path.abspath(fasta_db_path)[:-6] + "_concatenated_target_decoy.fasta"
+
+        task_run("Creating decoy database...", decoy_args, check_for_file=database_file, check=True)
     else:
         # simply use the selected database file
         database_file = os.path.abspath(fasta_db_path)
