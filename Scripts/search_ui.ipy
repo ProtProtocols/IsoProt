@@ -8,6 +8,8 @@ Input (search_ui_in):
                                 design has been saved. If this is not set, nothing will
                                 be displayed once the user clicks "Save design"
   :key on_complete_function: Function called once the user clicked the complete button.
+  :key on_change_input_dir: If set, this function is called whenever the user changes the input directory.
+                            The function must look like on_change(search_ui_object, input_dir_path)
 
 Output (search_ui_out):
     :key work_dir: Path to the working directory.
@@ -324,7 +326,7 @@ class SearchUI:
         self.updateFastaFiles(spectradir)
     
         for file in dirList:
-            file_path = os.path.join(os.path.abspath(spectradir), file)
+            file_path = os.path.join(spectradir, file)
 
             # if it's a file, test whether it's an MGF file
             if os.path.isfile(file_path) and file.lower().endswith(".mgf"):
@@ -355,12 +357,16 @@ class SearchUI:
                 self.spectra_file_dirs = list()
                 self.spectra_file_dirs.append(spectradir)
 
+        # call the user defined function if defined
+        global search_ui_in
+
+        if "on_change_input_dir" in search_ui_in:
+            search_ui_in["on_change_input_dir"](self, spectradir)
+
     def display(self):
         """
         Displays the search user interface.
         """
-        self.updateSpectraDir(self.spectra_dir.value)
-
         self.vbox_search = VBox([
             widgets.HTML("<h4>Folders and files</h4>"),
             widgets.HTML('Folder for spectra files (files need to be mgf) and fasta database<br/>'
@@ -398,6 +404,8 @@ class SearchUI:
         self.tabs.set_title(2, "Quantitative analysis")
 
         display(self.tabs)
+
+        self.updateSpectraDir(self.spectra_dir.value)
 
     def show_dialog(self, message: str, style: str= "default"):
         """
@@ -455,17 +463,28 @@ class SearchUI:
         self.target_fdr.value = settings["target_fdr"]
         self.number_groups.value = settings["number_groups"]
 
+        # load the experimental design
+        try:
+            self.load_exp_design()
+            self.show_dialog("Previous settings successfully loaded")
+        except Exception as e:
+            self.show_dialog(str(e) + ". Experimental design not loaded.", style="warning")
+
+    def load_exp_design(self, result_file_path=None):
+        """
+        Load the experimental design.
+        :param result_file_path: If set, this file will be used to load the experimental design. Otherwise,
+        the default location will be used.
+        """
         # regenerate the experimental design
         self.show_exp_design(change_tab=False)
 
         try:
-            design_loaded = self.expDesignUI.load_design()
-            self.show_dialog("Previous settings successfully loaded")
+            design_loaded = self.expDesignUI.load_design(result_file_path)
         except Exception as e:
-            self.show_dialog(str(e) + ". Experimental design not loaded.", style="warning")
             # reset any already added settings
             self.show_exp_design(change_tab=False)
-            design_loaded=False
+            raise e
 
         if design_loaded:
             self.set_enable_search_btn(True)
@@ -647,17 +666,22 @@ class ExpDesignUI:
         # move to the next tab
         self.searchUI.move_to_next_tab()
 
-    def load_design(self) -> bool:
+    def load_design(self, result_file_path: str = None) -> bool:
         """
         Load the experimental design settings from the defined
         result_file_path.
+        :param result_file_path: If this is set, this file will be loaded as experimental design file. Otherwise,
+        the result_file_path member variable will be used.
         :return: Boolean indicating whether the design was loaded
         """
-        if not os.path.isfile(self.result_file_path):
+        if result_file_path is None:
+            result_file_path = self.result_file_path
+
+        if not os.path.isfile(result_file_path):
             return False
 
         # load the design
-        design = pd.read_csv(self.result_file_path, sep="\t")
+        design = pd.read_csv(result_file_path, sep="\t")
 
         # get sample group names
         group_names = dict()

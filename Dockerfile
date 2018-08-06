@@ -47,6 +47,7 @@ RUN mkdir Scripts
 COPY Scripts/ Scripts/
 COPY Test/iTRAQCancer.mgf IN
 COPY Test/sp_human.fasta IN
+COPY Test/exp_design_example.tsv IN
 
 USER root
 
@@ -64,4 +65,4 @@ USER biodocker
 
 # Run example notebook to have the results ready
 #RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb
-RUN jupyter trust Example.ipynb
+RUN jupyter trust Example.ipyn
