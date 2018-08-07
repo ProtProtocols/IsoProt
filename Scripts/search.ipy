@@ -139,7 +139,11 @@ class TaskRunner:
         print("Start:", name)
 
         start_time = time.time()
-        task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
+        try:
+            task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
+        except subprocess.CalledProcessError as e:
+            print(e.stdout.decode())
+            raise e
 
         if task.returncode != 0:
             print(task.stdout.decode())
