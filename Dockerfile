@@ -65,4 +65,4 @@ USER biodocker
 
 # Run example notebook to have the results ready
 #RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb
-RUN jupyter trust Example.ipyn
+RUN jupyter trust Example.ipynb
