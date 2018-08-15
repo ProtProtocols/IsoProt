@@ -53,6 +53,9 @@ USER root
 
 RUN chown -R biodocker .
 
+# copy worflow diagram
+COPY ShortWorkflow.svg misc
+
 # To allow use of folder /data mounted to the outside
 RUN ln -s /data data
 
