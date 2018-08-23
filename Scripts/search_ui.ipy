@@ -158,6 +158,11 @@ class SearchUI:
                                                      value='iPQF')
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
+        self.method_peptide_inference = widgets.Dropdown(options={
+                                                            "Group shared proteins": "grouping",
+                                                            "Only unique peptides": "unique"
+                                                         },
+                                                         value="grouping")
 
         # get number of experimental conditions
         self.number_groups = widgets.IntSlider(min=2, max=20, step=1, value=2)
@@ -394,6 +399,7 @@ class SearchUI:
             Label('Summarization method:'), self.summarization_method,
             Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
             self.use_ptms_for_quant,
+            Label('Peptide inference method:'), self.method_peptide_inference,
             self.search_button
             ])
 
@@ -462,6 +468,7 @@ class SearchUI:
         self.use_ptms_for_quant.value = settings["use_ptms_for_quant"]
         self.target_fdr.value = settings["target_fdr"]
         self.number_groups.value = settings["number_groups"]
+        self.method_peptide_inference.value = settings["method_peptide_inference"]
 
         # load the experimental design
         try:
@@ -511,6 +518,7 @@ class SearchUI:
         search_config["target_fdr"] = self.target_fdr.value
         search_config["input_directory"] = self.spectra_file_dirs
         search_config["number_groups"] = self.number_groups.value
+        search_config["method_peptide_inference"] = self.method_peptide_inference.value
 
         return search_config
 
