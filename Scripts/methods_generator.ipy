@@ -1,0 +1,83 @@
+"""
+This module generates a methods section text to describe the current workflow.
+
+Input (methods_generator_in):
+  :key settings_file: Path to the settings file ("protocol_parameters.json") to use. The default
+                      is to use "OUT/protocol_parameters.json".
+
+Output (methods_generator_in):
+  None
+
+Example:
+    methods_generator_in = {"settings_file": "OUT/protocol_parameters.json"}
+
+    %run "Scripts/methods_generator.ipy"
+"""
+
+import ipywidgets as widgets
+from IPython.display import Javascript, display
+import os
+import json
+
+
+global methods_generator_in
+
+
+def load_settings_from_file(settings_file):
+    with open(settings_file, "r") as reader:
+        settings = json.load(reader)
+        return settings
+
+
+def generate_methods_text(settings: dict):
+    # TODO: This version must be kept up-to-date!
+    settings["fixed_ptm_string"] = "Carbamidomethylation and "
+    if settings["fixed_ptm_string"] == "None":
+        settings["fixed_ptm_string"] = ""
+
+    settings["var_ptms_string"] = "No variable modifications were used."
+
+    if len(settings["var_ptms"]) > 0:
+        settings["var_ptms_string"] = " and ".join(settings["var_ptms"]) + " were set as variable modifications."
+
+    settings["fasta_name"] = os.path.basename(settings["fasta_db"])
+    settings["use_ptms_for_quant_string"] = "were" if settings["use_ptms_for_quant"] else "were not"
+
+    return "<b>Citations are added as PubMed ids</b><br />" \
+    "The mass spectrometry data was analysed using the 'TMT Protocol' version 0.1 from the IsoLabelledProtocols " \
+    "collection (https://github.com/ProtProtocols/IsoLabeledProtocol). MS/MS spectra were converted to MGF format using " \
+    "ProteoWizard's msconvert tool <b>ADAPT AS NEEDED!!!</b>. Spectra were identified using MSGF+ [cite 25358478] through " \
+    "SearchGui version 3.3.3 [cite 29774740]. The precursor tolerance was set to {precursor_tolerance} ppm and the fragment " \
+    "tolerance to {fragment_tolerance} Daltons. {missed_cleavages} missed cleavages were allowed. {fixed_ptm_string} " \
+    "{labelling} were set as fixed modifications. {var_ptms_string} PSMs were filtered at a target FDR of {target_fdr} " \
+    "using the target-decoy approach. Sequences from {fasta_name} version ... were used for spectra identification " \
+    "<b>ADAPT AS APPROPRIATE!!!</b>. <br />" \
+    "Quantitative analysis was done using the R Bioconductor package MSnbase version 2.7.1 [cite 22113085]. Protein " \
+    "summarization was performed using the {summarization_method} method. Modified peptides {use_ptms_for_quant_string} " \
+    "used for quantitation. Only proteins with at least {min_protein_psms} identified peptides were accepted for further " \
+    "analysis. Differential " \
+    "expression was assessed using the R Bioconductor package limma version 3.34 [cite 25605792].".format(**settings)
+
+
+def main():
+    global methods_generator_in
+
+    settings_file = "OUT/protocol_parameters.json"
+
+    if "methods_generator_in" in globals() and "settings_file" in methods_generator_in:
+        settings_file = methods_generator_in["settings_file"]
+
+    # make sure the settings file exists
+    if not os.path.exists(settings_file):
+        print("Error: " + settings_file + " could not be found")
+        return
+
+    settings = load_settings_from_file(settings_file)
+
+    methods_text = generate_methods_text(settings)
+
+    display(widgets.HTML(methods_text))
+
+
+if __name__ == "__main__":
+    main()
