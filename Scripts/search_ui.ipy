@@ -121,7 +121,7 @@ class SearchUI:
         self.generate_decoy = widgets.Checkbox(value=True, description="Generate decoy sequences")
 
         # search settings
-        self.precursor_tolerance = widgets.IntSlider(min=-10, max=30, step=1, value=10)
+        self.precursor_tolerance = widgets.IntSlider(min=0, max=500, step=1, value=10)
         self.fragment_tolerance = widgets.BoundedFloatText(min=0, max=200, value=0.05)
         self.missed_cleavages = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.fixed_ptms = widgets.Dropdown(options=["Carbamidomethylation of C", "None"])
