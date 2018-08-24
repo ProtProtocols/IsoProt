@@ -30,7 +30,7 @@ docker run -it -p 8888:8888 -v ./:/data/ -v ./OUT:/home/biodocker/OUT veitveit/i
 
 - Open your favorite web browser and access the image via 0.0.0.0:8888
 
-- You can start with the example use case by clicking on the file TMT_Workflow.ipynb
+- You can start with the example use case by clicking on the file Isobaric_Workflow.ipynb
 
 ## Feedback
 
