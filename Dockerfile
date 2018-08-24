@@ -40,7 +40,7 @@ ENV PATH /home/biodocker/bin/SearchGUI:/home/biodocker/bin/PeptideShaker:$PATH
 
 WORKDIR /home/biodocker/
 
-COPY Example.ipynb .
+COPY Isobaric_Workflow.ipynb .
 COPY Description.ipynb .
 #COPY Example_isobar.ipynb .
 RUN mkdir Scripts
