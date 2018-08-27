@@ -20,7 +20,7 @@ Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
 - Just run the _run.bat_ or _run.sh_ scripts. This should download (if not available already) the image, run it and open the interface in your browser.
 
 
-_Alternatively, _ run the following commands have to be executed in your operating system's command prompt.
+_Alternatively,_  run the following commands have to be executed in your operating system's command prompt.
 
 - Get the last release docker image (you might need to be administrator): 
 ```bash
