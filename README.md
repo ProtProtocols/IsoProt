@@ -8,23 +8,36 @@ The pipelines are made available as [Docker](https://www.docker.com) containers.
 
 This project is **still under development**. All resources are only intended to be used for testing. We are simply not done yet.
 
+## Releases
+Batch and bash files for downloading and running the different releases are available in the _RELEASE_ folder.
+
+Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
+
 ## Usage
-- You need to have docker installed. For more details, see https://docs.docker.com/engine/installation/
+- You need to have the docker engine installed. For more details, see https://docs.docker.com/engine/installation/
+  In the case of not having a compatible operating system (e.g. Windows 7), you need to install the _Docker Toolbox_: https://docs.docker.com/toolbox/toolbox_install_windows/#what-you-get-and-how-it-works
 
-The following commands have to be execute in your operating systems command prompt.
+- Just run the _run.bat_ or _run.sh_ scripts. This should download (if not available already) the image, run it and open the interface in your browser.
 
-- Get the docker image (you might need to be administrator): 
+
+_Alternatively, _ run the following commands have to be execute in your operating systems command prompt.
+
+- Get the last release docker image (you might need to be administrator): 
+```bash
+docker pull veitveit/isolabeledprotocol:release-0.1
+```
+- Get the latest development docker image (you might need to be administrator): 
 ```bash
 docker pull veitveit/isolabeledprotocol:latest
 ```
 
-- Run the image
+- Run the image (add :"release-x" or :"latest" when you have downloaded both versions)
 ```bash
-docker run -it -p 8888:8888 veitveit/isolabeledprotocol:latest
+docker run -it -p 8888:8888 veitveit/isolabeledprotocol
 ```
 or, to mirror your current folder onto _/data_ and the output folder in the docker to _OUT_ in your folder
 ```bash
-docker run -it -p 8888:8888 -v ./:/data/ -v ./OUT:/home/biodocker/OUT veitveit/isolabeledprotocol:latest
+docker run -it -p 8888:8888 -v ./:/data/ -v ./OUT:/home/biodocker/OUT veitveit/isolabeledprotocol
 ```
 
 
