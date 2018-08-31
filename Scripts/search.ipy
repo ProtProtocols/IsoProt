@@ -135,15 +135,38 @@ class TaskRunner:
     def __init__(self, cwd):
         self.cwd = cwd
 
+    def _write_log(self, entry):
+        """
+        Append to the default log file
+        :param entry: The entry to add
+        """
+        if not isinstance(entry, str):
+            entry = entry.decode()
+
+        with open(os.path.join(self.cwd, "search_processed.log"), "a") as writer:
+            writer.write(entry)
+
     def __call__(self, name, param_list, check_for_file=None, **kwargv):
         print("Start:", name)
+        self._write_log("------------ " + name + "----------\n")
+        self._write_log("System call: " + " ".join(param_list) + "\n")
 
         start_time = time.time()
         try:
             task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
         except subprocess.CalledProcessError as e:
+            if e.stdout is not None:
+                self._write_log(e.stdout)
+            if e.stdout is not None:
+                self._write_log(e.stderr)
             print(e.stdout.decode())
             raise e
+
+        # write the complete task output to the log file
+        if task.stderr is not None:
+            self._write_log(task.stderr)
+        if task.stdout is not None:
+            self._write_log(task.stdout)
 
         if task.returncode != 0:
             print(task.stdout.decode())
@@ -186,7 +209,7 @@ def run(work_dir: str,
     task_run = TaskRunner(work_dir)
 
     # get the free memory in MB
-    free_mem = round(psutil.virtual_memory().available / 1024 / 1024)
+    free_mem = round(psutil.virtual_memory().free / 1024 / 1024)
     # if there's more than 1G available, leave 1G for other tasks
     if free_mem > 1000:
         free_mem -= 1000
