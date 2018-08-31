@@ -1,0 +1,2 @@
+java  -Xmx2G -cp /home/biodocker/bin/PeptideShaker-1.16.27/PeptideShaker-1.16.27.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -useGeneMapping 0 -experiment experiment1 -sample test -replicate 1 -identification_files /home/biodocker/OUT -out /home/biodocker/OUT/experiment.cpsx -id_params /home/biodocker/OUT/search.par -spectrum_files /home/biodocker/IN/iTRAQCancer.mgf
+
