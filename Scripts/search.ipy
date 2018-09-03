@@ -143,7 +143,12 @@ class TaskRunner:
         if not isinstance(entry, str):
             entry = entry.decode()
 
-        with open(os.path.join(self.cwd, "search_processed.log"), "a") as writer:
+        log_dir = os.path.join(self.cwd, "LOG")
+
+        if not os.path.isdir(log_dir):
+            os.mkdir(log_dir)
+
+        with open(os.path.join(log_dir, "search_processed.log"), "a") as writer:
             writer.write(entry)
 
     def __call__(self, name, param_list, check_for_file=None, **kwargv):
