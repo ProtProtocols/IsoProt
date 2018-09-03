@@ -210,11 +210,8 @@ def run(work_dir: str,
 
     # get the free memory in MB
     free_mem = round(psutil.virtual_memory().available / 1024 / 1024)
-    # if there's more than 1G available, leave 1G for other tasks
-    if free_mem > 2000:
-        free_mem -= 1000
     # use a minimum of 1G
-    elif free_mem < 1000:
+    if free_mem < 1000:
         free_mem = 1000
 
     # create the directory paths to work in
