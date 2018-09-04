@@ -53,6 +53,9 @@ USER root
 
 RUN chown -R biodocker .
 
+# remove LOG folder (will be part of the OUT folder)
+RUN rmdir /home/biodocker/LOG
+
 # copy worflow diagram
 COPY misc/ShortWorkflow.svg misc
 COPY misc/ExperimentalDesigns.svg misc
