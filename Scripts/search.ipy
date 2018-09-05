@@ -98,19 +98,26 @@ def adapt_mgf_titles(filenames):
         os.rename(filename + ".tmp", filename)
 
 
-def filter_mgf_peaks(filenames, min_mz=100, max_mz=150):
+def filter_mgf_peaks(filenames, output_directory = None, min_mz=100, max_mz=150):
     """
     Removes all peaks from the passed mgf files that are below min_mz or
     above max_mz. The results are written to files with the same name but
     ".filtered" appended to the name.
 
     :param: filenames: List of filenames to process.
+    :param output_directory: Define the output directory where the files should be stored. If set to None the
+                             files will be created in the same directory as the original ones.
     :param: min_mz: Minimum m/z a peak must have to be kept
     :param: max_mz: Maximum m/z a peak may have to be kept
     """
     for filename in filenames:
+        if output_directory is None:
+            target_name = filename + ".filtered"
+        else:
+            target_name = os.path.join(os.path.abspath(output_directory), os.path.basename(filename) + ".filtered")
+
         with open(filename, "r") as reader:
-            with open(filename + ".filtered", "w") as writer:
+            with open(target_name, "w") as writer:
                 for line in reader:
                     # check if it's a peak
                     if line[0].isdigit():
@@ -206,7 +213,7 @@ def run(work_dir: str,
     :return: tsv_result_file_path
     """
 
-    # function to callculate paths local to work_dir
+    # function to calculate paths local to work_dir
     def get_path(*args):
         return os.path.join(work_dir, *args)
 
@@ -251,7 +258,7 @@ def run(work_dir: str,
     print(mgf_filenames)
 
     print("Extracting reporter peaks...")
-    filter_mgf_peaks(mgf_filenames)
+    filter_mgf_peaks(mgf_filenames, output_directory=work_dir)
 
     # -------------------------------------
     # Generate the decoy database
