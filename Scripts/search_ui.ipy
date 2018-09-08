@@ -27,9 +27,12 @@ Output (search_ui_out):
     :key use_ptms_for_quant: Indicates whether PTMs should be used for the quantification.
     :key target_fdr: Target FDR to use (all levels).
     :key spec_file_dir: Path to the spectrum directories (or base directory when one MS sample type).
-    :key num_groups: Number of experimental conditions.
+    :key number_groups: Number of experimental conditions.
+    :key ref_condition: Normalize to this reference instead of mean of channels
+    :key stat_condition: Carry out statistical tests with respect to this condition
     :key search_ui: The SearchUI object.
 """
+
 
 import ipywidgets as widgets
 from ipywidgets import VBox, Label, Layout, Text
@@ -165,7 +168,25 @@ class SearchUI:
 
         # get number of experimental conditions
         self.number_groups = widgets.IntSlider(min=2, max=20, step=1, value=2)
+        self.number_groups.observe(self.updateQuantOptions)
 
+        
+        
+        # Option to select reference condition
+        all_groups = list()
+        ref_groups = list()
+        for group in range(0, self.number_groups.value):
+            all_groups.append("Group " + str(group+1))
+        ref_groups.append('Mean over channels')
+        ref_groups.extend(all_groups)
+        self.ref_condition = widgets.ToggleButtons(options=ref_groups,
+            description='')
+
+        # set control condition for statistical tests 
+        self.stat_condition = widgets.ToggleButtons(options=all_groups,
+            description='')
+
+        
         # button to show experimental design
         self.exp_des_button = widgets.Button(
             description='Generate design',
@@ -284,6 +305,20 @@ class SearchUI:
         """
         self.search_button.disabled = not is_enabled
 
+    def updateQuantOptions(self, change):
+        """
+        Upon changes of number of conditions, set the correct values to the ref_ and stat_condition
+        """
+        all_groups = list()
+        ref_groups = list()
+        for group in range(0, self.number_groups.value):
+            all_groups.append("Group " + str(group+1))
+        ref_groups.append('Mean over channels')
+        ref_groups.extend(all_groups)
+        self.ref_condition.options = ref_groups
+        self.stat_condition.options = all_groups
+
+
     def updateFastaFiles(self, spectradir):
         """
         Update the drop-down list that lists all available FASTA files found in the
@@ -399,7 +434,10 @@ class SearchUI:
             Label('Minimum number of PSMs per protein:'), self.min_protein_psms,
             self.use_ptms_for_quant,
             Label('Peptide inference method:'), self.method_peptide_inference,
+            Label("Reference condition for normalization:"),self.ref_condition,
+            Label("Experimental control condition for statistical tests:"),self.stat_condition,            
             self.search_button
+            
             ])
 
         self.tabs = widgets.Tab()
@@ -467,6 +505,8 @@ class SearchUI:
         self.use_ptms_for_quant.value = settings["use_ptms_for_quant"]
         self.target_fdr.value = settings["target_fdr"]
         self.number_groups.value = settings["number_groups"]
+        self.ref_condition.value = settings["ref_condition"]
+        self.stat_condition.value = settings["stat_condition"]
         self.method_peptide_inference.value = settings["method_peptide_inference"]
 
         # load the experimental design
@@ -517,6 +557,8 @@ class SearchUI:
         search_config["target_fdr"] = self.target_fdr.value
         search_config["input_directory"] = self.spectra_file_dirs
         search_config["number_groups"] = self.number_groups.value
+        search_config["ref_condition"] = self.ref_condition.value
+        search_config["stat_condition"] = self.stat_condition.value
         search_config["method_peptide_inference"] = self.method_peptide_inference.value
 
         return search_config
@@ -570,8 +612,8 @@ class ExpDesignUI:
         self.group_ids.append("Group 1")
         for group in range(1, searchUI.number_groups.value):
             self.group_names.append(widgets.Text(placeholder="Treatment " + str(group), description="Group " + str(group+1) + ":"))
-            self.group_ids.append("Group " + str(group+1))
-
+            self.group_ids.append("Group " + str(group+1))          
+        
         self.channels = {
             'TMT6': ["126", "127", "128", "129", "130", "131"],
             'TMT10': ["126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131"],
@@ -619,7 +661,7 @@ class ExpDesignUI:
         widget_list = list()
         widget_list.append(widgets.Label("Treatment group names:"))
         widget_list.extend(self.group_names)
-
+        
         for sample_dir in range(0,len(self.spectra_file_dirs)): 
             widget_list.append(widgets.HTML("<br/>"))
             widget_list.append(widgets.HTML("Assign sample to channels in folder <b>" + self.spectra_file_dirs[sample_dir] + "</b>"))
@@ -656,7 +698,9 @@ class ExpDesignUI:
             # replace the group names
             for i in range(0, len(self.channel_names[sample_dir])):
                 ind = int(self.group_selects[sample_dir][i].value.replace("Group ","")) -1 
+                group = self.group_selects[sample_dir][i].value
                 sample_group_names.append(self.group_names[ind].value if self.group_names[ind].value != "" else self.group_names[ind].placeholder)
+
                 
             sample_dir_names.extend([self.spectra_file_dirs[sample_dir]] * len(self.channel_names[sample_dir]))
   
@@ -700,6 +744,8 @@ class ExpDesignUI:
             group_id = "Group " + str(i + 1)
             if group_id in group_names:
                 self.group_names[i].value = group_names[group_id]
+                
+        # TODO get reference conditions
 
         # get the folders and make sure they exist
         spec_dirs = set([s for s in design["spec_dir"]])
