@@ -18,6 +18,10 @@ RUN pip3 install psutil && \
     pip3 install pandas && \
     pip3 install tzlocal
 
+# Change welcome page to include correct link to notebook
+COPY misc/tree.html /usr/local/lib/python3.5/dist-packages/notebook/templates/
+
+
 
 # Install SearchGui and PeptideShaker
 USER biodocker
@@ -73,3 +77,4 @@ USER biodocker
 # Run example notebook to have the results ready
 #RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb
 RUN jupyter trust Isobaric_Workflow.ipynb
+RUN jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace Isobaric_Workflow.ipynb
