@@ -505,9 +505,14 @@ class SearchUI:
         self.use_ptms_for_quant.value = settings["use_ptms_for_quant"]
         self.target_fdr.value = settings["target_fdr"]
         self.number_groups.value = settings["number_groups"]
-        self.ref_condition.value = settings["ref_condition"]
-        self.stat_condition.value = settings["stat_condition"]
-        self.method_peptide_inference.value = settings["method_peptide_inference"]
+
+        # all new features need to check whether the config is available
+        if "ref_condition" in settings:
+            self.ref_condition.value = settings["ref_condition"]
+        if "stat_condition" in settings:
+            self.stat_condition.value = settings["stat_condition"]
+        if "method_peptide_inference" in settings:
+            self.method_peptide_inference.value = settings["method_peptide_inference"]
 
         # load the experimental design
         try:
