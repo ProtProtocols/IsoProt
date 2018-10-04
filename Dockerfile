@@ -17,7 +17,7 @@ RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 RUN pip3 install psutil && \
     pip3 install pandas && \
     pip3 install tzlocal && \
-    pip3 install button_execute
+    pip3 install button-execute
 
 # Change welcome page to include correct link to notebook
 COPY misc/tree.html /usr/local/lib/python3.5/dist-packages/notebook/templates/
