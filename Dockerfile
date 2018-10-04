@@ -16,12 +16,11 @@ RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 # Install python packages
 RUN pip3 install psutil && \
     pip3 install pandas && \
-    pip3 install tzlocal
+    pip3 install tzlocal && \
+    pip3 install button_execute
 
 # Change welcome page to include correct link to notebook
 COPY misc/tree.html /usr/local/lib/python3.5/dist-packages/notebook/templates/
-
-
 
 # Install SearchGui and PeptideShaker
 USER biodocker
@@ -67,14 +66,16 @@ COPY misc/ExperimentalDesigns.svg misc
 # To allow use of folder /data mounted to the outside
 RUN ln -s /data data
 
+# Install additional Jupyter extensions
+RUN jupyter nbextension enable --py --sys-prefix button_execute
+
 # Testing
 #RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install --user && pip ins#tall jupyter_nbextensions_configurator && jupyter nbextensions_configurator enable --sys-prefix 
 #COPY notebook.json .jupyter/nbconfig/
 
 USER biodocker
 
-
 # Run example notebook to have the results ready
 #RUN jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=3600 --execute Example.ipynb && mv Example.nbconvert.ipynb Example.ipynb
-RUN jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace Isobaric_Workflow.ipynb
-RUN jupyter trust Isobaric_Workflow.ipynb
+RUN jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace Isobaric_Workflow.ipynb && \
+    jupyter trust Isobaric_Workflow.ipynb
