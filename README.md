@@ -10,25 +10,26 @@ The pipelines are made available as [Docker](https://www.docker.com) containers.
 
 This project is **still under development**. All resources are only intended to be used for testing. We are simply not done yet.
 
-## Releases
-Batch and bash files for downloading and running the different releases are available in the _RELEASE_ folder.
+## Installation / Usage
 
-Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
+### Requirements
 
-## Usage
 - You need to have the docker engine installed. For more details, see https://docs.docker.com/engine/installation/
   In the case of not having a compatible operating system (e.g. Windows 7), you need to install the _Docker Toolbox_: https://docs.docker.com/toolbox/toolbox_install_windows/#what-you-get-and-how-it-works
 
-- Just run the _run.bat_ or _run.sh_ scripts. This should download (if not available already) the image, run it and open the interface in your browser.
+### docker-launcher
 
+The easiest way to run ProtProtocol protocols is through our [docker-launcher](https://github.com/ProtProtocols/docker-launcher) application. It provides a simple graphical user interface that takes care of downloading the protocol and launching the docker image taking care of all required parameters. As it is a [Java](https://www.java.com) application it supports Windows, Mac OS X, and Linux.
 
-_Alternatively,_  run the following commands have to be executed in your operating system's command prompt.
+### Manual launch
 
-- Get the last release docker image (you might need to be administrator): 
+To launch docker images manually, you need to open your operating system's command prompt (ie. PowerShell on Windows). The docker commands are the same on all operating systems.
+
+- Download the latest stable version of the protocol (you might need to be administrator): 
 ```bash
 docker pull veitveit/isolabeledprotocol:release-0.1
 ```
-- Get the latest development docker image (you might need to be administrator): 
+- Download the latest development version of the protocol (you might need to be administrator): 
 ```bash
 docker pull veitveit/isolabeledprotocol:latest
 ```
@@ -37,16 +38,41 @@ docker pull veitveit/isolabeledprotocol:latest
 ```bash
 docker run -it -p 8888:8888 veitveit/isolabeledprotocol
 ```
-or, to mirror your current folder onto _/data_ and the output folder in the docker to _OUT_ in your folder
+
+In order to directly access your computer's folders through the docker image (recommended option) map local directories
+to the containers _/data_ (for input data) and _OUT_ (for output data) folders:
+
 ```bash
-docker run -it -p 8888:8888 -v ./:/data/ -v ./OUT:/home/biodocker/OUT veitveit/isolabeledprotocol
+docker run -it -p 8888:8888 -v /path/to/my/mgf/files:/data/ -v /path/to/my/result/folder:/home/biodocker/OUT veitveit/isolabeledprotocol
 ```
 
-
+**Note**: When running Docker Toolbox (ie. only available version on Windows 7), local paths must be below _C:\Users_. Additionally, paths need to specified in the following format:
+```
+# to map C:\Users\Johannes\Downloads
+docker run -it -p 8888:8888 -v /c/users/johannes/downloads:/data/ -v /c/users/johannes/results:/home/biodocker/OUT veitveit/isolabeledprotocol
+```
 - Open your favorite web browser and access the image via 0.0.0.0:8888
 
 - You can start with the example use case by clicking on the file Isobaric_Workflow.ipynb
 
+## Releases
+
+Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
+
 ## Feedback
 
 In case you have any questions about using the pipeline or find an issue, please simply [submit an issue](https://github.com/ProtProtocols/IsoLabeledProtocol/issues) through this GitHub page.
+
+## Development
+
+Any code fixes / enhancements are highly welcome as pull requests.
+
+### Repository directory structure
+
+Jupyter notebooks (.ipnyb) files are kept in the main directory.
+
+  * DockerSetup: files related to building the docker image
+  * RELEASE: (deprecated) Directory to bundle release files. This functionality has been taken over by [docker-launcher](https://github.com/ProtProtocols/docker-launcher)
+  * Scripts: Collection of python modules that provide functionality shared between protocols (display of GUI for search parameters, etc.)
+  * Test: Example dataset to test the pipeline
+  * misc: Images etc. to make things look nice
