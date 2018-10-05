@@ -8,8 +8,9 @@
 
 ## Release
 
-  * Build image and release to DockerHub using the above version (format: "X.X")
+  * Build image and release to DockerHub using the the format: `release-X.X`
   * Release an updated version of `docker-launcher` to support the new version
+    * Note: docker-launcher will automatically detect the new version based on the GitHub tag but as a fallback uses an interal list as well.
 
 ## Move to next development version
 
@@ -23,6 +24,6 @@ git push
 git push --tags
 ```
 
-**Note**: In future version, `docker-launcher` will automatically detect new image versions based on the
-available tags in the repository. Therefore, the new tag should only be pushed to the repository once
-the docker image with that version is available.
+**Note**: `docker-launcher` will automatically detect new image versions based on the
+available tags in the repository. Therefore, the new tag must only be pushed to the repository once
+the docker image with that version is available (using the `release-X.X` format).
