@@ -76,3 +76,9 @@ Jupyter notebooks (.ipnyb) files are kept in the main directory.
   * Scripts: Collection of python modules that provide functionality shared between protocols (display of GUI for search parameters, etc.)
   * Test: Example dataset to test the pipeline
   * misc: Images etc. to make things look nice
+
+## Acknowledgements
+
+![EU Flag](misc/flag_yellow_low.jpg) ![ERC Logo](misc/LOGO-ERC.jpg)
+
+This project has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme under grant agreement No 788042.
