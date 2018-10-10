@@ -79,6 +79,5 @@ Jupyter notebooks (.ipnyb) files are kept in the main directory.
 
 ## Acknowledgements
 
-<img src="misc/flag_yellow_low.jpg" style="margin-bottom: 50px" height="100" />
-<img src="misc/LOGO-ERC.jpg" height="200" />
+<img src="misc/flag_yellow_low.png" height="200" /><img src="misc/LOGO-ERC.jpg" height="200" />
 This project has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme under grant agreement No 788042.
