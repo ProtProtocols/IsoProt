@@ -158,7 +158,7 @@ class SearchUI:
                                                       "iPQF: weighted by peptide features (removes all proteins with "
                                                       "missing values)": "iPQF",
                                                       "Robust summarization (linear model rlm)": "robust"},
-                                                     value='iPQF')
+                                                     value='medpolish')
         self.min_protein_psms = widgets.IntSlider(min=0, max=10, step=1, value=1)
         self.use_ptms_for_quant = widgets.Checkbox(value=True, description="Use PTMs for quantification")
         self.method_peptide_inference = widgets.Dropdown(options={
