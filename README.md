@@ -1,4 +1,4 @@
-# IsoLabeledProtocol
+# IsoProt
 
 This project provides a reproducible pipeline to analyse isobarically labelled mass spectrometry based quantitative proteomics data.
 
@@ -61,7 +61,7 @@ Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
 
 ## Feedback
 
-In case you have any questions about using the pipeline or find an issue, please simply [submit an issue](https://github.com/ProtProtocols/IsoLabeledProtocol/issues) through this GitHub page.
+In case you have any questions about using the pipeline or find an issue, please simply [submit an issue](https://github.com/ProtProtocols/IsoProt/issues) through this GitHub page.
 
 ## Development
 
