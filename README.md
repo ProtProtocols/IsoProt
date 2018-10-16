@@ -27,29 +27,29 @@ To launch docker images manually, you need to open your operating system's comma
 
 - Download the latest stable version of the protocol (you might need to be administrator): 
 ```bash
-docker pull veitveit/isolabeledprotocol:release-0.1
+docker pull veitveit/isoprot:release-0.1
 ```
 - Download the latest development version of the protocol (you might need to be administrator): 
 ```bash
-docker pull veitveit/isolabeledprotocol:latest
+docker pull veitveit/isoprot:latest
 ```
 
 - Run the image (add :"release-x" or :"latest" when you have downloaded both versions)
 ```bash
-docker run -it -p 8888:8888 veitveit/isolabeledprotocol
+docker run -it -p 8888:8888 veitveit/isoprot
 ```
 
 In order to directly access your computer's folders through the docker image (recommended option) map local directories
 to the containers _/data_ (for input data) and _OUT_ (for output data) folders:
 
 ```bash
-docker run -it -p 8888:8888 -v /path/to/my/mgf/files:/data/ -v /path/to/my/result/folder:/home/biodocker/OUT veitveit/isolabeledprotocol
+docker run -it -p 8888:8888 -v /path/to/my/mgf/files:/data/ -v /path/to/my/result/folder:/home/biodocker/OUT veitveit/isoprot
 ```
 
 **Note**: When running Docker Toolbox (ie. only available version on Windows 7), local paths must be below _C:\Users_. Additionally, paths need to specified in the following format:
 ```
 # to map C:\Users\Johannes\Downloads
-docker run -it -p 8888:8888 -v /c/users/johannes/downloads:/data/ -v /c/users/johannes/results:/home/biodocker/OUT veitveit/isolabeledprotocol
+docker run -it -p 8888:8888 -v /c/users/johannes/downloads:/data/ -v /c/users/johannes/results:/home/biodocker/OUT veitveit/isoprot
 ```
 - Open your favorite web browser and access the image via 0.0.0.0:8888
 
