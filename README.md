@@ -10,6 +10,10 @@ The pipelines are made available as [Docker](https://www.docker.com) containers.
 
 This project is **still under development**. All resources are only intended to be used for testing. We are simply not done yet.
 
+## Citation
+
+IsoProt: A fully reproducible one-stop-shop for the analysis of iTRAQ/TMT data. Johannes Griss, Goran Vinterhalter, Veit Schwaemmle. bioRxiv 446070; doi: https://doi.org/10.1101/446070 
+
 ## Installation / Usage
 
 ### Requirements
