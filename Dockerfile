@@ -1,4 +1,4 @@
-FROM veitveit/protprotocols_template
+FROM protprotocols/protprotocols_template
 
 USER root
 

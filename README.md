@@ -31,35 +31,37 @@ To launch docker images manually, you need to open your operating system's comma
 
 - Download the latest stable version of the protocol (you might need to be administrator): 
 ```bash
-docker pull veitveit/isoprot:release-0.1
+docker pull protprotocols/isoprot:release-0.2
 ```
 - Download the latest development version of the protocol (you might need to be administrator): 
 ```bash
-docker pull veitveit/isoprot:latest
+docker pull protprotocols/isoprot:latest
 ```
 
 - Run the image (add :"release-x" or :"latest" when you have downloaded both versions)
 ```bash
-docker run -it -p 8888:8888 veitveit/isoprot
+docker run -it -p 8888:8888 protprotocols/isoprot
 ```
 
 In order to directly access your computer's folders through the docker image (recommended option) map local directories
 to the containers _/data_ (for input data) and _OUT_ (for output data) folders:
 
 ```bash
-docker run -it -p 8888:8888 -v /path/to/my/mgf/files:/data/ -v /path/to/my/result/folder:/home/biodocker/OUT veitveit/isoprot
+docker run -it -p 8888:8888 -v /path/to/my/mgf/files:/data/ -v /path/to/my/result/folder:/home/biodocker/OUT protprotocols/isoprot
 ```
 
 **Note**: When running Docker Toolbox (ie. only available version on Windows 7), local paths must be below _C:\Users_. Additionally, paths need to specified in the following format:
 ```
 # to map C:\Users\Johannes\Downloads
-docker run -it -p 8888:8888 -v /c/users/johannes/downloads:/data/ -v /c/users/johannes/results:/home/biodocker/OUT veitveit/isoprot
+docker run -it -p 8888:8888 -v /c/users/johannes/downloads:/data/ -v /c/users/johannes/results:/home/biodocker/OUT protprotocols/isoprot
 ```
 - Open your favorite web browser and access the image via 0.0.0.0:8888
 
 - You can start with the example use case by clicking on the file Isobaric_Workflow.ipynb
 
 ## Releases
+
+Release 0.2: Feature complete version of the protocol supporting complex experimental designs. This version was used during the analysis of the benchmark studies in the IsoProt manuscript.
 
 Release 0.1: First fully functional version for analyzing iTRAQ/TMT data.
 
