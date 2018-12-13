@@ -165,13 +165,12 @@ class TaskRunner:
 
         start_time = time.time()
         try:
-            task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargv)
+            task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                  universal_newlines=True, **kwargv)
         except subprocess.CalledProcessError as e:
             if e.stdout is not None:
                 self._write_log(e.stdout)
-            if e.stdout is not None:
-                self._write_log(e.stderr)
-            print(e.stdout.decode())
+            print(e.stdout)
             raise e
 
         # write the complete task output to the log file
@@ -181,12 +180,12 @@ class TaskRunner:
             self._write_log(task.stdout)
 
         if task.returncode != 0:
-            print(task.stdout.decode())
+            print(task.stdout)
             raise Exception("Error: %s failed" % name)
 
         if check_for_file:
             if not os.path.isfile(check_for_file):
-                print(task.stdout.decode())
+                print(task.stdout)
                 raise Exception("Error: Result file '%s' not found." % check_for_file)
 
         run_time = time.time() - start_time
