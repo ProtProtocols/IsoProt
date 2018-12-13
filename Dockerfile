@@ -5,7 +5,7 @@ USER root
 # Install Mono - note: This must run before the R setup as packages required by R are
 # installed as well.
 RUN apt-get update \
- && apt-get install -y mono-complete libxml2-dev libnetcdf-dev \
+ && apt-get install -y --no-install-recommends mono-complete libxml2-dev libnetcdf-dev \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
