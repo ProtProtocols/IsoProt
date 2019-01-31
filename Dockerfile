@@ -10,6 +10,11 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # Setup R
+RUN apt-get update && apt-get install -y software-properties-common apt-transport-https && apt-get clean
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && add-apt-repository 'deb [arch=amd64,i386]  https://cran.rstudio.com/bin/linux/ubuntu xenial-cran35/'
+RUN apt-get update && apt-get install -y r-base && apt-get clean
+
+
 ADD DockerSetup/install_packages.R /tmp/
 RUN Rscript /tmp/install_packages.R && rm /tmp/install_packages.R
 
