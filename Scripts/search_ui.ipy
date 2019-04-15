@@ -144,6 +144,7 @@ class SearchUI:
         self.labelling = widgets.Dropdown(options=
                                           {'TMT6': 'TMT 6-plex of K,TMT 6-plex of peptide N-term',
                                            'TMT10': 'TMT 10-plex of K,TMT 10-plex of peptide N-term',
+                                           'TMT11': 'TMT 11-plex of K,TMT 11-plex of peptide N-term',
                                            'iTRAQ4 (Y fixed)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of Y,iTRAQ 4-plex of peptide N-term',
                                            'iTRAQ4 (Y variable)': 'iTRAQ 4-plex of K,iTRAQ 4-plex of peptide N-term',
                                            'iTRAQ8 (Y fixed)': 'iTRAQ 8-plex of K,iTRAQ 8-plex of Y,iTRAQ 8-plex of peptide N-term',

@@ -166,7 +166,7 @@ class TaskRunner:
         start_time = time.time()
         try:
             task = subprocess.run(param_list, cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                  universal_newlines=True, **kwargv)
+                                  **kwargv)
         except subprocess.CalledProcessError as e:
             if e.stdout is not None:
                 self._write_log(e.stdout)
@@ -230,8 +230,8 @@ def run(work_dir: str,
     if not os.path.isdir(peaklist_abspath):
         raise Exception("Invalid peak list directory selected: " + peaklist_abspath + " does not exist.")
 
-    peptide_shaker_jar_path = "/home/biodocker/bin/PeptideShaker-1.16.27/PeptideShaker-1.16.27.jar"
-    searchgui_jar_path = "/home/biodocker/bin/SearchGUI-3.3.3/SearchGUI-3.3.3.jar"
+    peptide_shaker_jar_path = "/home/biodocker/bin/PeptideShaker-1.16.38/PeptideShaker-1.16.38.jar"
+    searchgui_jar_path = "/home/biodocker/bin/SearchGUI-3.3.13/SearchGUI-3.3.13.jar"
 
     # the searches should be performed in the "OUT" directory
     if not os.path.isdir(work_dir):
@@ -378,7 +378,7 @@ def run(work_dir: str,
               "-cp", peptide_shaker_jar_path, "eu.isas.peptideshaker.cmd.ReportCLI",
               "-in", peptide_shaker_result_file_path,
               "-out_reports", work_dir,
-              "-reports", "8"],
+              "-reports", "11"],
              check_for_file=tsv_result_file_path,
              universal_newlines=True
              )
