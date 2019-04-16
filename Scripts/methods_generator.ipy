@@ -47,7 +47,7 @@ def generate_methods_text(settings: dict):
     "The mass spectrometry data was analysed using the 'Isobaric Workflow' from the IsoProt ProtProtocol " \
     "collection version 'latest' (https://github.com/ProtProtocols/IsoProt). MS/MS spectra were converted to MGF format using " \
     "ProteoWizard's msconvert tool <b>ADAPT AS NEEDED!!!</b>. Spectra were identified using MSGF+ [cite 25358478] through " \
-    "SearchGui version 3.3.3 [cite 29774740]. The precursor tolerance was set to {precursor_tolerance} ppm and the fragment " \
+    "SearchGui version 3.3.13 [cite 29774740]. The precursor tolerance was set to {precursor_tolerance} ppm and the fragment " \
     "tolerance to {fragment_tolerance} Daltons. {missed_cleavages} missed cleavages were allowed. {fixed_ptm_string} " \
     "{labelling} were set as fixed modifications. {var_ptms_string} PSMs were filtered at a target FDR of {target_fdr} " \
     "using the target-decoy approach. Sequences from {fasta_name} version ... were used for spectra identification " \
