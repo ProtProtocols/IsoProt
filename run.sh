@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-img_name="veitveit/isoprot" 
+img_name="protprotocols/isoprot" 
 if [ -n "$1" ]; then img_name=$1; fi
 
 # TODO  have an option to override with named parameter
